@@ -201,7 +201,8 @@ const Button = styled.button`
   background: transparent;
   width: 200px;
   border: none;
-  margin-top: 10px;
+  margin-top: 15px;
+  margin-bottom: 5px;
   margin-left: 0;
   padding-left: 0;
 `;
