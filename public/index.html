@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style='height:100%'>
+<html lang="en" style="height: 100%">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -25,69 +25,77 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>TranslationTool 2021</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/themes/kelly.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-​
+    ​
     <!-- Chart code -->
-    <script>
-    am4core.ready(function() {
-​
-    // Themes begin
-    am4core.useTheme(am4themes_kelly);
-    am4core.useTheme(am4themes_animated);
-    // Themes end
-​
-    // Create chart instance
-    var chart = am4core.create("chartdiv", am4charts.PieChart);
-​
-    // Add data
-    chart.data = [ {
-      "things": "내용 오역",
-      "ratio": 30
-    }, {
-      "things": "불필요한 첨가",
-      "ratio": 39
-    }, {
-      "things": "문체 부적합",
-      "ratio": 19
-    } ];
-​
-    // Set inner radius
-    chart.innerRadius = am4core.percent(40);
-​
-    // Add and configure Series
-    var pieSeries = chart.series.push(new am4charts.PieSeries());
-    pieSeries.dataFields.value = "ratio";
-    pieSeries.dataFields.category = "things";
-    pieSeries.slices.template.stroke = am4core.color("#fff");
-    pieSeries.slices.template.strokeWidth = 2;
-    pieSeries.slices.template.strokeOpacity = 1;
-​
-    // This creates initial animation
-    pieSeries.hiddenState.properties.opacity = 1;
-    pieSeries.hiddenState.properties.endAngle = -90;
-    pieSeries.hiddenState.properties.startAngle = -90;
-​
-    }); // end am4core.ready()
+    <!-- <script>
+          am4core.ready(function() {
+      ​
+          // Themes begin
+          am4core.useTheme(am4themes_kelly);
+          am4core.useTheme(am4themes_animated);
+          // Themes end
+      ​
+          // Create chart instance
+          var chart = am4core.create("chartdiv", am4charts.PieChart);
+      ​
+          // Add data
+          chart.data = [ {
+            "things": "내용 오역",
+            "ratio": 30
+          }, {
+            "things": "불필요한 첨가",
+            "ratio": 39
+          }, {
+            "things": "문체 부적합",
+            "ratio": 19
+          } ];
+      ​
+          // Set inner radius
+          chart.innerRadius = am4core.percent(40);
+      ​
+          // Add and configure Series
+          var pieSeries = chart.series.push(new am4charts.PieSeries());
+          pieSeries.dataFields.value = "ratio";
+          pieSeries.dataFields.category = "things";
+          pieSeries.slices.template.stroke = am4core.color("#fff");
+          pieSeries.slices.template.strokeWidth = 2;
+          pieSeries.slices.template.strokeOpacity = 1;
+      ​
+          // This creates initial animation
+          pieSeries.hiddenState.properties.opacity = 1;
+          pieSeries.hiddenState.properties.endAngle = -90;
+          pieSeries.hiddenState.properties.startAngle = -90;
+      ​
+          }); // end am4core.ready() -->
     </script>
-​
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    ​
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   </head>
-  <body style='height:100%'>
+  <body style="height: 100%; margin:0;">
     <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ko_KR/sdk.js#xfbml=1&version=v11.0&appId=3693437344130307&autoLogAppEvents=1" nonce="8XVx1v7N"></script>
+    <script
+      async
+      defer
+      crossorigin="anonymous"
+      src="https://connect.facebook.net/ko_KR/sdk.js#xfbml=1&version=v11.0&appId=3693437344130307&autoLogAppEvents=1"
+      nonce="8XVx1v7N"
+    ></script>
     <!-- Add Here for Kakao SDK-->
     <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <script>
-      Kakao.init('0555450413cee561bf29e8d79ae6dbbe')
-      console.log(Kakao.isInitialized())
+      Kakao.init('0555450413cee561bf29e8d79ae6dbbe');
+      console.log(Kakao.isInitialized());
     </script>
     <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <div id="root" style='height:100%'></div>
-    
+    <div id="root" style="height: 100%; margin:0;"></div>
+    <!-- <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
+      type="text/javascript"
+    ></script>
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/kelly.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script> -->
   </body>
 </html>
