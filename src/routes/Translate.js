@@ -13,12 +13,15 @@ const dummyData = {
     { value: '내용 오역', label: '내용 오역' },
     { value: '불필요한 첨가', label: '불필요한 첨가' },
     { value: '문제 부적합', label: '문제 부적합' },
+    { value: '직접 입력', label: '직접 입력' },
   ],
 };
 
 function Translate() {
   const [inputText, setInputText] = useState('');
   const [selected, setSelected] = useState('내용 오역');
+  const [isToggled, setIsToggled] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -78,16 +81,48 @@ function Translate() {
     const handleChange = (e) => {
       e.preventDefault();
       setSelected(e.target.value);
+      console.log(selected);
+      if (e.target.value === '직접 입력') {
+        setIsToggled(true);
+      }
     };
 
     return (
-      <SelectList onChange={handleChange}>
-        {props.data.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </SelectList>
+      <FeedBackSelect>
+        <SelectList onChange={handleChange}>
+          {props.data.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectList>
+        <SelectedLabel>: {selectedText[nextId.current].text}</SelectedLabel>
+      </FeedBackSelect>
+    );
+  };
+  const SelectCT = (props) => {
+    const inputOnChange = (e) => {
+      e.preventDefault();
+      setInputValue(e.target.value);
+    };
+
+    const doneOnClick = () => {
+      setSelected(inputValue);
+      setIsToggled(false);
+      console.log(selected);
+      setInputValue('');
+    };
+
+    return (
+      <>
+        <SelectBox data={dummyData.options} value={selected} />
+        <ToggleInputContainer isToggled={isToggled}>
+          <SelectInput value={inputValue} onChange={inputOnChange} />
+          <Button type="submit" onClick={doneOnClick}>
+            Done
+          </Button>
+        </ToggleInputContainer>
+      </>
     );
   };
 
@@ -99,10 +134,7 @@ function Translate() {
 
     return (
       <InputContainer>
-        <FeedBackSelect>
-          <SelectBox data={dummyData.options} value={selected} />
-          <SelectedLabel>: {selectedText[nextId.current].text}</SelectedLabel>
-        </FeedBackSelect>
+        {SelectCT()}
         <InputBox
           placeholder="Enter your feedback here"
           onChange={onChange}
@@ -187,7 +219,7 @@ const Container = styled.div`
 
 const TextContainer = styled.div`
   width: 1500px;
-  height: 400px;
+  height: 500px;
   display: flex;
   border: 1px solid grey;
   justify-content: space-around;
@@ -197,7 +229,7 @@ const TextContainer = styled.div`
 
 const InputContainer = styled.div`
   width: 1500px;
-  height: 200px;
+  height: 500px;
   border: 1px solid grey;
   display: flex;
   flex-direction: column;
@@ -226,6 +258,15 @@ const TextField = styled.div`
 const FeedBackSelect = styled.div`
   width: 100%;
   display: flex;
+  align-items: center;
+`;
+
+const ToggleInputContainer = styled.div`
+  display: flex;
+  width: 500px;
+  height: 100px;
+  display: ${(props) => (props.isToggled ? 'inherit' : 'none')};
+  justify-content: space-between;
   align-items: center;
 `;
 
@@ -288,4 +329,16 @@ const FeedBackBox = styled.div`
   justify-content: space-between;
   margin: 10px;
   align-items: center;
+`;
+
+const SelectInput = styled.input`
+  width: 300px;
+  height: 50px;
+  margin: 10px;
+  border-radius: 8px;
+  border: 1px solid grey;
+  display: inherit;
+  :focus {
+    outline: none;
+  }
 `;
