@@ -6,11 +6,13 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "chart.js": "^3.5.0",
     "firebase": "^8.8.0",
     "highlightable": "^1.0.7",
     "jquery": "^3.6.0",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
+    "react-chartjs-2": "^3.0.4",
     "react-dom": "^17.0.2",
     "react-highlight": "^0.14.0",
     "react-highlight-words": "^0.17.0",
@@ -27,6 +29,9 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
+    "globals": {
+      "_": true
+    },
     "extends": [
       "react-app",
       "react-app/jest"
