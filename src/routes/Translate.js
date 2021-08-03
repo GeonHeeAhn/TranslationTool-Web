@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import Highlighter from 'react-highlight-words';
-import { useHistory } from 'react-router';
-import { authService } from '../fbase';
 import { Doughnut } from 'react-chartjs-2';
 
 const dummyData = {
@@ -58,7 +56,6 @@ function Translate() {
       selectedText: '',
     },
   ]);
-  const history = useHistory();
   const nextId = useRef(0);
   const FBId = useRef(1);
 
@@ -66,11 +63,6 @@ function Translate() {
     feedBack.splice(0, 1);
     // selectedText.splice(0, 1);
   }, []);
-
-  const onLogOutClick = () => {
-    authService.signOut();
-    history.push('/');
-  };
 
   const sendFeedBack = () => {
     const FB = {
@@ -238,7 +230,6 @@ function Translate() {
       <TextBox />
       {Input()}
       <FeedBack list={feedBack} />
-      <Button onClick={onLogOutClick}>press here to logout</Button>
     </Container>
   );
 }

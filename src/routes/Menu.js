@@ -1,8 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router';
+import { authService } from '../fbase';
 
 const Menu = () => {
+  let history = useHistory();
+  const onLogOutClick = () => {
+    authService.signOut();
+    history.push('/');
+  };
+
   return (
     <Container>
       <Link to="/student">
@@ -11,11 +19,15 @@ const Menu = () => {
       <Link to="/professor">
         <Button>교수용</Button>
       </Link>
+      <Button
+        onClick={onLogOutClick}
+        style={{ position: 'absolute', bottom: '20px' }}
+      >
+        press here to logout{' '}
+      </Button>
     </Container>
   );
 };
-
-export default Menu;
 
 const Container = styled.div`
   display: flex;
@@ -45,3 +57,5 @@ const Button = styled.button`
     color: black;
   }
 `;
+
+export { Menu, Button };

@@ -4,7 +4,7 @@ import Auth from '../routes/Auth';
 import Home from '../routes/Home';
 import Translate from '../routes/Translate';
 import Student from '../routes/Student';
-import Menu from '../routes/Menu';
+import { Menu } from '../routes/Menu';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
