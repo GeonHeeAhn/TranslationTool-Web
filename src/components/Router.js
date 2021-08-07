@@ -4,6 +4,7 @@ import Auth from '../routes/Auth';
 import Home from '../routes/Home';
 import Translate from '../routes/Translate';
 import Student from '../routes/Student';
+import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
 
 const AppRouter = ({ isLoggedIn }) => {
@@ -17,7 +18,8 @@ const AppRouter = ({ isLoggedIn }) => {
           <Route exact path="/" component={Menu} />
           <Switch>
             <Route path="/professor" component={Translate} />
-            <Route path="/student" component={Student} />
+            {/* <Route path="/student" component={Student} /> */}
+            <Route path="/taskmenu" component={TaskSelect} />
           </Switch>
         </>
       ) : (

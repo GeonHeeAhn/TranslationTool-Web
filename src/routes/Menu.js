@@ -13,7 +13,7 @@ const Menu = () => {
 
   return (
     <Container>
-      <Link to="/student">
+      <Link to="/taskmenu">
         <Button>학생용</Button>
       </Link>
       <Link to="/professor">
@@ -58,4 +58,4 @@ const Button = styled.button`
   }
 `;
 
-export { Menu, Button };
+export { Menu, Button, Container };

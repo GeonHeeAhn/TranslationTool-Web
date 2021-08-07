@@ -137,9 +137,9 @@ const BottomContainer = styled.div`
 
 const IdInput = styled.input`
   width: 15%;
-  height: 10%;
+  height: 30px;
   padding: 1%;
-  border-radius: 12px;
+  border-radius: 15px;
   border: 1px solid #dadada;
   :focus {
     outline: none;
