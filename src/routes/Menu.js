@@ -17,7 +17,7 @@ const Menu = () => {
         <Button>학생용</Button>
       </Link>
       <Link to="/professor">
-        <Button>교수용</Button>
+        <Button disabled>교수용</Button>
       </Link>
       <Button
         onClick={onLogOutClick}

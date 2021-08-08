@@ -4,7 +4,7 @@ import { Button } from 'routes/Menu';
 import dummyData from '../dummyData.js';
 import { CSVLink } from 'react-csv';
 
-const Student = ({ match }) => {
+const Student = ({ match, history }) => {
   const studentData = dummyData.student_data.find(
     (studentData) => studentData.id === match.params.id
   );
@@ -32,7 +32,7 @@ const Student = ({ match }) => {
         translate_txt: transText,
       };
       setData([...data, datas]);
-      console.log(data);
+      history.goBack();
     }
   };
 
