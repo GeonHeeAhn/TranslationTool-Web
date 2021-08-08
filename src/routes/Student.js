@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { Button } from 'routes/Menu';
 import dummyData from '../dummyData.js';
 import { CSVLink } from 'react-csv';
+import { dbService } from 'fbase';
 
 const Student = ({ match, history }) => {
   const studentData = dummyData.student_data.find(
     (studentData) => studentData.id === match.params.id
   );
   const [transText, setTransText] = useState('');
-  const [id, setId] = useState();
+  const [id, setId] = useState('');
   const [data, setData] = useState([]);
 
   const translateOnChange = (e) => {
@@ -21,7 +22,7 @@ const Student = ({ match, history }) => {
     setId(e.target.value);
   };
 
-  const downloadOnClick = () => {
+  const downloadOnClick = async() => {
     if (id === null || id === '') {
       window.alert('학번을 입력해주세요.');
       return false;
@@ -32,6 +33,14 @@ const Student = ({ match, history }) => {
         translate_txt: transText,
       };
       setData([...data, datas]);
+      await dbService
+        .collection('student')
+        .add({
+          studentID: id,
+          scriptID: studentData.id,
+          translate_txt: transText,
+        });
+      setId('');
       history.goBack();
     }
   };
@@ -52,9 +61,9 @@ const Student = ({ match, history }) => {
           value={id}
           onChange={inputOnChange}
         />
-        <CSVLink data={data}>
-          <StyledButton onClick={downloadOnClick}>Submit</StyledButton>
-        </CSVLink>
+        {/* <CSVLink data={data}> */}
+        <StyledButton onClick={downloadOnClick}>Submit</StyledButton>
+        {/* </CSVLink> */}
       </BottomContainer>
     </Container>
   );
