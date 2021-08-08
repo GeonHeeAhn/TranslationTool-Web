@@ -4,7 +4,10 @@ import { Button } from 'routes/Menu';
 import dummyData from '../dummyData.js';
 import { CSVLink } from 'react-csv';
 
-const MyTaskContainer = () => {
+const Student = ({ match }) => {
+  const studentData = dummyData.student_data.find(
+    (studentData) => studentData.id === match.params.id
+  );
   const [transText, setTransText] = useState('');
   const [id, setId] = useState();
   const [data, setData] = useState([]);
@@ -25,7 +28,7 @@ const MyTaskContainer = () => {
     } else {
       const datas = {
         studentID: id,
-        scriptID: dummyData.student_data[0].id,
+        scriptID: studentData.id,
         translate_txt: transText,
       };
       setData([...data, datas]);
@@ -34,9 +37,9 @@ const MyTaskContainer = () => {
   };
 
   return (
-    <>
+    <Container>
       <TextContainer>
-        <Script>{dummyData.student_data[0].script}</Script>
+        <Script>{studentData.script}</Script>
         <Translate
           placeholder="Textarea"
           value={transText}
@@ -53,12 +56,8 @@ const MyTaskContainer = () => {
           <StyledButton onClick={downloadOnClick}>Submit</StyledButton>
         </CSVLink>
       </BottomContainer>
-    </>
+    </Container>
   );
-};
-
-const Student = () => {
-  return <Container>{MyTaskContainer()}</Container>;
 };
 
 export default Student;
