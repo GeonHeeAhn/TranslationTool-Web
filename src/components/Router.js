@@ -7,7 +7,7 @@ import Student from '../routes/Student';
 import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
 
-const AppRouter = ({ isLoggedIn }) => {
+const AppRouter = ({ isLoggedIn, userObj }) => {
   return (
     <Router>
       <Link to="/" />
@@ -18,8 +18,7 @@ const AppRouter = ({ isLoggedIn }) => {
           <Route exact path="/" component={Menu} />
           <Switch>
             <Route path="/professor" component={Translate} />
-            {/* <Route path="/student" component={Student} /> */}
-            <Route path="/taskmenu" component={TaskSelect} />
+            <Route path="/taskmenu" component={TaskSelect} userObj={userObj} />
           </Switch>
         </>
       ) : (

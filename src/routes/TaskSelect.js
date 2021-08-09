@@ -10,28 +10,35 @@ const SelectList = ({ match }) => {
     <StyledContainer>
       {dummyData.student_data.map((item) => (
         <Link to={`${match.url}/${item.id}`}>
-          <Button>{item.label}</Button>
+          <StyledButton>{item.label}</StyledButton>
         </Link>
       ))}
     </StyledContainer>
   );
 };
 
-export default function TaskSelect({ match }) {
+export default function TaskSelect({ match, userObj }) {
   return (
     <>
       <Route exact path={match.path} component={SelectList} />
-      <Route path={`${match.path}/:id`} component={Student} />
+      <Route path={`${match.path}/:id`} component={Student} userObj={userObj} />
     </>
   );
 }
 
 const StyledContainer = styled(Container)`
-  padding: 10px;
-  width: 320px;
-  height: 430px;
-  overflow-y: auto;
-  ::-webkit-scrollbar {
-    display: none;
-  }
+  padding: 20px;
+  width: 300px;
+  height: 410px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: space-around;
+`;
+
+const StyledButton = styled(Button)`
+  width: 130px;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  font-size: 0.9rem;
 `;

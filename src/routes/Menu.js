@@ -38,6 +38,10 @@ const Container = styled.div`
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
   width: 350px;
   height: 450px;
+  overflow-y: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Button = styled.button`
