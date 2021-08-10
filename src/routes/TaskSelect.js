@@ -10,21 +10,25 @@ const SelectList = ({ match }) => {
     <StyledContainer>
       {dummyData.student_data.map((item) => (
         <Link to={`${match.url}/${item.id}`}>
+          {/* <div key={item.id}> */}
           <StyledButton>{item.label}</StyledButton>
+          {/* </div> */}
         </Link>
       ))}
     </StyledContainer>
   );
 };
 
-export default function TaskSelect({ match, userObj }) {
+const TaskSelect = ({ match }) => {
   return (
     <>
       <Route exact path={match.path} component={SelectList} />
-      <Route path={`${match.path}/:id`} component={Student} userObj={userObj} />
+      <Route path={`${match.path}/:id`} component={Student} />
     </>
   );
-}
+};
+
+export default TaskSelect;
 
 const StyledContainer = styled(Container)`
   padding: 20px;

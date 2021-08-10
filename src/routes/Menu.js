@@ -13,10 +13,10 @@ const Menu = () => {
 
   return (
     <Container>
-      <Link to="/taskmenu">
+      <Link to="/forstudent">
         <Button>학생용</Button>
       </Link>
-      <Link to="/professor">
+      <Link to="/forprofessor">
         <Button>교수용</Button>
       </Link>
       <Button

@@ -3,12 +3,15 @@ import styled, { createGlobalStyle } from 'styled-components';
 import Highlighter from 'react-highlight-words';
 import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
+import { dbService } from 'fbase.js';
 
-function Translate() {
+function Translate({ match }) {
   const [inputText, setInputText] = useState('');
+  const [studentScript, setstudentScript] = useState([]);
   const [selected, setSelected] = useState('내용 오역');
   const [isToggled, setIsToggled] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [studentData, setStudentData] = useState();
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -26,10 +29,26 @@ function Translate() {
   ]);
   const nextId = useRef(0);
   const FBId = useRef(1);
+  const getScripts = async () => {
+    const dbScript = await dbService.collection('student').get();
+    const arr = [];
+    for (const document of dbScript.docs) {
+      arr.push({
+        ...document.data(),
+        id: document.id,
+      });
+    }
+    setstudentScript(arr);
+    // const scriptObj = {
+    //   ...document.data(),
+    //   id: document.id,
+    // };
+    // setstudentScript([scriptObj, ...studentScript]);
+  };
 
   useEffect(() => {
     feedBack.splice(0, 1);
-    // selectedText.splice(0, 1);
+    getScripts();
   }, []);
 
   const sendFeedBack = () => {
@@ -37,7 +56,6 @@ function Translate() {
       id: FBId.current,
       feedBack: selected,
       comment: inputText,
-      // selectedText: selectedText[nextId.current].text,
       selectedText: selectedText[nextId.current],
     };
     setFeedBack([...feedBack, FB]);
@@ -129,7 +147,7 @@ function Translate() {
       <FeedBackContainer>
         <FeedBackList>
           {feedBack.map((el) => (
-            <FeedBackBox>
+            <FeedBackBox key={el.id}>
               <div>
                 {el.id} . {el.feedBack} : {el.comment}
               </div>
@@ -146,36 +164,49 @@ function Translate() {
 
   const TextBox = () => {
     const [id, setId] = useState(0);
-    const [stringToFind, setStringToFind] = useState('');
     const [indexNumber, setIndexNumber] = useState();
+    const studentTxt = () => {
+      if (studentScript.length === 0) {
+        return 'none';
+      } else {
+        const ss = studentScript.find((ss) => ss.scriptID === match.params.id);
+        setStudentData(ss);
+        return ss.translate_txt;
+      }
+    };
     const dragAndSelect = (e) => {
+      console.log(studentData);
       e.preventDefault();
-      const sentence = window.getSelection().toString();
+      const sentence = window
+        .getSelection()
+        .toString()
+        .replace(/(\r\n\t|\n|\r\t)/gm, '');
       setIndexNumber(
-        parseInt(
-          (dummyData.translate_data[id].output_data.indexOf(sentence) + 45) / 45
-        )
+        parseInt((studentData.translate_txt.indexOf(sentence) + 45) / 45)
       );
+
+      console.log(sentence);
+
       const select = {
         id: nextId.current,
         indexNum: parseInt(
-          (dummyData.translate_data[id].output_data.indexOf(sentence) + 45) / 45
+          (studentData.translate_txt.indexOf(sentence) + 45) / 45
         ),
         text: window.getSelection().toString(),
       };
-      console.log(dummyData.translate_data[id].output_data.indexOf(sentence));
+      console.log(studentData.translate_txt.indexOf(sentence));
       setSelectedText([...selectedText, select]);
       nextId.current += 1;
       console.log(selectedText);
     };
 
-    const WrappedBefore = wrapper(dummyData.translate_data[id].input_data, {
-      wrapOn: 80,
+    const WrappedBefore = wrapper(dummyData.translate_data[id].output_data, {
+      wrapOn: 45,
       continuationIndent: '\n',
     });
 
-    const WrappedAfter = wrapper(dummyData.translate_data[id].output_data, {
-      wrapOn: 45,
+    const WrappedAfter = wrapper(studentTxt(), {
+      wrapOn: 38,
       continuationIndent: '\n',
     });
 
@@ -199,6 +230,7 @@ function Translate() {
       <TextContainer>
         <ChangeButton onClick={minusId}>-</ChangeButton>
         <TextField>
+          {/* {inputTxt()} */}
           {WrappedBefore.split('\n').map((line) => {
             return (
               <span>

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from 'routes/Menu';
 import dummyData from '../dummyData.js';
-import { dbService } from 'fbase';
+import { dbService, authService } from 'fbase';
 
-const Student = ({ match, history, userObj }) => {
+const Student = ({ match, history }) => {
   const studentData = dummyData.student_data.find(
     (studentData) => studentData.id === match.params.id
   );
@@ -33,11 +33,11 @@ const Student = ({ match, history, userObj }) => {
         // userID: userObj.uid,
       };
       setData([...data, datas]);
-      await dbService.collection('student').add({
+      await dbService.collection('test').add({
         studentID: id,
         scriptID: studentData.id,
         translate_txt: transText,
-        // userID: userObj.uid,
+        userID: authService.currentUser.uid,
       });
       setId('');
       history.goBack();
@@ -49,6 +49,7 @@ const Student = ({ match, history, userObj }) => {
     <Container>
       <TextContainer>
         <Script>{studentData.script}</Script>
+        {console.log(authService.currentUser.uid)}
         <Translate
           placeholder="Textarea"
           value={transText}

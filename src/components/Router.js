@@ -6,8 +6,10 @@ import Translate from '../routes/Translate';
 import Student from '../routes/Student';
 import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
+import { useState } from 'react';
+import profMenu from '../routes/ProfMenu';
 
-const AppRouter = ({ isLoggedIn, userObj }) => {
+const AppRouter = ({ isLoggedIn }) => {
   return (
     <Router>
       <Link to="/" />
@@ -18,7 +20,8 @@ const AppRouter = ({ isLoggedIn, userObj }) => {
           <Route exact path="/" component={Menu} />
           <Switch>
             <Route path="/professor" component={Translate} />
-            <Route path="/taskmenu" component={TaskSelect} userObj={userObj} />
+            <Route path="/forstudent" component={TaskSelect} />
+            <Route path="/forprofessor" component={profMenu} />
           </Switch>
         </>
       ) : (
