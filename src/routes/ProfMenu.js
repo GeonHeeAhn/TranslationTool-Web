@@ -4,6 +4,7 @@ import { Button, Container } from 'routes/Menu';
 import Translate from 'routes/Translate';
 import { Route, Link } from 'react-router-dom';
 import { dbService } from 'fbase.js';
+import dummyData from '../dummyData.js';
 
 const SelectList = ({ match }) => {
   const [subjectId, setSubjectId] = useState([]);
@@ -34,11 +35,9 @@ const SelectList = ({ match }) => {
 
   return (
     <StyledContainer>
-      {subjectId.map((item) => (
-        <Link to={`${match.url}/${item}`}>
-          <div key={item}>
-            <StyledButton>{item}</StyledButton>
-          </div>
+      {dummyData.student_data.map((item) => (
+        <Link to={`${match.url}/${item.id}`}>
+          <StyledButton>{item.label}</StyledButton>
         </Link>
       ))}
     </StyledContainer>

@@ -11,7 +11,7 @@ function Translate({ match }) {
   const [selected, setSelected] = useState('내용 오역');
   const [isToggled, setIsToggled] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [studentData, setStudentData] = useState();
+  const [num, setNum] = useState(0);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -33,22 +33,27 @@ function Translate({ match }) {
     const dbScript = await dbService.collection('student').get();
     const arr = [];
     for (const document of dbScript.docs) {
-      arr.push({
-        ...document.data(),
-        id: document.id,
-      });
+      arr.push({ ...document.data(), id: document.id });
     }
-    setstudentScript(arr);
-    // const scriptObj = {
-    //   ...document.data(),
-    //   id: document.id,
-    // };
-    // setstudentScript([scriptObj, ...studentScript]);
+    let Arr = [];
+    Arr = arr.filter((el) => el.scriptID === match.params.id);
+    console.log(Arr);
+    console.log(arr);
+    setstudentScript(Arr);
+  };
+
+  const isStudentScriptEmpty = () => {
+    if (studentScript.length === 0) {
+      return 'none';
+    } else {
+      return studentScript[num].translate_txt;
+    }
   };
 
   useEffect(() => {
     feedBack.splice(0, 1);
     getScripts();
+    isStudentScriptEmpty();
   }, []);
 
   const sendFeedBack = () => {
@@ -165,24 +170,15 @@ function Translate({ match }) {
   const TextBox = () => {
     const [id, setId] = useState(0);
     const [indexNumber, setIndexNumber] = useState();
-    const studentTxt = () => {
-      if (studentScript.length === 0) {
-        return 'none';
-      } else {
-        const ss = studentScript.find((ss) => ss.scriptID === match.params.id);
-        setStudentData(ss);
-        return ss.translate_txt;
-      }
-    };
     const dragAndSelect = (e) => {
-      console.log(studentData);
+      console.log(studentScript);
       e.preventDefault();
       const sentence = window
         .getSelection()
         .toString()
         .replace(/(\r\n\t|\n|\r\t)/gm, '');
       setIndexNumber(
-        parseInt((studentData.translate_txt.indexOf(sentence) + 45) / 45)
+        parseInt((studentScript[num].translate_txt.indexOf(sentence) + 45) / 45)
       );
 
       console.log(sentence);
@@ -190,11 +186,11 @@ function Translate({ match }) {
       const select = {
         id: nextId.current,
         indexNum: parseInt(
-          (studentData.translate_txt.indexOf(sentence) + 45) / 45
+          (studentScript[num].translate_txt.indexOf(sentence) + 45) / 45
         ),
         text: window.getSelection().toString(),
       };
-      console.log(studentData.translate_txt.indexOf(sentence));
+      console.log(studentScript[num].translate_txt.indexOf(sentence));
       setSelectedText([...selectedText, select]);
       nextId.current += 1;
       console.log(selectedText);
@@ -205,24 +201,24 @@ function Translate({ match }) {
       continuationIndent: '\n',
     });
 
-    const WrappedAfter = wrapper(studentTxt(), {
+    const WrappedAfter = wrapper(isStudentScriptEmpty(), {
       wrapOn: 38,
       continuationIndent: '\n',
     });
 
     const plusId = () => {
-      if (id === dummyData.translate_data.length - 1) {
+      if (num === studentScript.length - 1) {
         alert('더 이상 뒤로 갈 수 없습니다.');
       } else {
-        setId(id + 1);
+        setNum(num + 1);
       }
     };
 
     const minusId = () => {
-      if (id === 0) {
+      if (num === 0) {
         alert('더 이상 앞으로 갈 수 없습니다.');
       } else {
-        setId(id - 1);
+        setNum(num - 1);
       }
     };
 
