@@ -11,6 +11,7 @@ function Translate({ match }) {
   const [inputText, setInputText] = useState('');
   const [studentScript, setstudentScript] = useState([]);
   const [num, setNum] = useState(0);
+  const [originalScript, setOriginalScript] = useState([]);
   const [finalComment, setFinalComment] = useState();
   const [value, setValue] = useState();
   const [selectedText, setSelectedText] = useState([
@@ -38,16 +39,28 @@ function Translate({ match }) {
     }
     let Arr = [];
     Arr = arr.filter((el) => el.scriptID === match.params.id);
-    console.log(Arr);
-    console.log(arr);
     setstudentScript(Arr);
   };
 
   const IsStudentScriptEmpty = () => {
     if (studentScript.length === 0) {
-      return 'none';
+      return 'loading';
     } else {
       return studentScript[num].translate_txt;
+    }
+  };
+
+  const findScript = () => {
+    setOriginalScript(
+      dummyData.student_data.find((el) => el.id === match.params.id)
+    );
+  };
+
+  const isOriginalScriptEmpty = () => {
+    if (originalScript.length === 0) {
+      return 'loading';
+    } else {
+      return originalScript.script;
     }
   };
 
@@ -55,6 +68,7 @@ function Translate({ match }) {
     feedBack.splice(0, 1);
     getScripts();
     IsStudentScriptEmpty();
+    findScript();
   }, []);
 
   const sendFeedBack = () => {
@@ -175,7 +189,7 @@ function Translate({ match }) {
       console.log(selectedText);
     };
 
-    const WrappedBefore = wrapper(dummyData.translate_data[id].output_data, {
+    const WrappedBefore = wrapper(isOriginalScriptEmpty(), {
       wrapOn: 45,
       continuationIndent: '\n',
     });
@@ -428,7 +442,7 @@ const ChangeButton = styled.button`
   width: 30px;
   height: 30px;
   border-radius: 100px;
-  border: 1px solid grey;
+  border: none;
   :focus {
     outline: none;
   }

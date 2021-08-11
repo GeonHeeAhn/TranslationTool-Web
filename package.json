@@ -13,6 +13,7 @@
     "highlightable": "^1.0.7",
     "jquery": "^3.6.0",
     "linewrap": "^0.2.1",
+    "nivo": "^0.31.0",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-chartjs-2": "^3.0.4",
