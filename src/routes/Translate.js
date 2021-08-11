@@ -4,15 +4,14 @@ import CreatableSelect from 'react-select/creatable';
 import Highlighter from 'react-highlight-words';
 import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
-import { dbService } from 'fbase.js';
+import { dbService, authService } from 'fbase.js';
+import { Container, IdInput, StyledButton } from 'routes/Student.js';
 
 function Translate({ match }) {
   const [inputText, setInputText] = useState('');
   const [studentScript, setstudentScript] = useState([]);
-  const [selected, setSelected] = useState('내용 오역');
-  const [isToggled, setIsToggled] = useState(false);
-  const [inputValue, setInputValue] = useState('');
   const [num, setNum] = useState(0);
+  const [finalComment, setFinalComment] = useState();
   const [value, setValue] = useState();
   const [selectedText, setSelectedText] = useState([
     {
@@ -44,7 +43,7 @@ function Translate({ match }) {
     setstudentScript(Arr);
   };
 
-  const isStudentScriptEmpty = () => {
+  const IsStudentScriptEmpty = () => {
     if (studentScript.length === 0) {
       return 'none';
     } else {
@@ -55,7 +54,7 @@ function Translate({ match }) {
   useEffect(() => {
     feedBack.splice(0, 1);
     getScripts();
-    isStudentScriptEmpty();
+    IsStudentScriptEmpty();
   }, []);
 
   const sendFeedBack = () => {
@@ -181,7 +180,7 @@ function Translate({ match }) {
       continuationIndent: '\n',
     });
 
-    const WrappedAfter = wrapper(isStudentScriptEmpty(), {
+    const WrappedAfter = wrapper(IsStudentScriptEmpty(), {
       wrapOn: 38,
       continuationIndent: '\n',
     });
@@ -206,7 +205,6 @@ function Translate({ match }) {
       <TextContainer>
         <ChangeButton onClick={minusId}>-</ChangeButton>
         <TextField>
-          {/* {inputTxt()} */}
           {WrappedBefore.split('\n').map((line) => {
             return (
               <span>
@@ -237,13 +235,59 @@ function Translate({ match }) {
     );
   };
 
+  const BottomContainer = () => {
+    const [profId, setProfId] = useState('');
+    const CommentOnChange = (e) => {
+      e.preventDefault();
+      setFinalComment(e.target.value);
+    };
+
+    const onSubmit = async () => {
+      console.log('이거지정');
+      await dbService.collection('test').add({
+        student_ID: studentScript[0].studentID,
+        script_ID: studentScript[0].scriptID,
+        //translate_txt: transText, //원문?필요한가?
+        professor_name: profId,
+        professor_ID: authService.currentUser.uid,
+        feedBack: feedBack,
+        general_critique: finalComment,
+      });
+      window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
+    };
+
+    const inputOnChange = (e) => {
+      setProfId(e.target.value);
+    };
+
+    return (
+      <FinalCommentContainer>
+        <div>총평</div>
+        <FinalComment
+          placeholder="총평을 적어주세요"
+          onChange={CommentOnChange}
+          value={finalComment}
+        />
+        <IdInput
+          placeholder="Enter your Id"
+          value={profId}
+          onChange={inputOnChange}
+        />
+        <Button onClick={onSubmit}>제출하기</Button>
+      </FinalCommentContainer>
+    );
+  };
+
   return (
-    <Container>
+    <>
       <GlobalStyle />
-      <TextBox />
-      {InputLayout()}
-      <FeedBack list={feedBack} />
-    </Container>
+      <StyledContainer>
+        <TextBox />
+        {InputLayout()}
+        <FeedBack list={feedBack} />
+        {BottomContainer()}
+      </StyledContainer>
+    </>
   );
 }
 
@@ -263,31 +307,27 @@ const GlobalStyle = createGlobalStyle`
     margin-bottom: 5px;
   }
 `;
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-direction: column;
-  margin: 15px;
+const StyledContainer = styled(Container)`
+  overflow-y: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const TextContainer = styled.div`
-  width: 1500px;
-  height: 600px;
+  margin-top: 5%;
+  min-height: 300px;
+  width: 100%;
+  height: 40%;
   display: flex;
-  border: 1px solid grey;
   justify-content: space-around;
   align-items: center;
   margin-bottom: 20px;
 `;
 
 const InputContainer = styled.div`
-  width: 1500px;
-  height: 500px;
-  border: 1px solid grey;
+  width: 100%;
+  height: 35%;
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
@@ -295,20 +335,22 @@ const InputContainer = styled.div`
 `;
 
 const FeedBackContainer = styled.div`
-  width: 1500px;
-  height: 250px;
-  border: 1px solid grey;
+  width: 100%;
+  /* min-height: 200px; */
+  height: 50%;
   display: flex;
   align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 25px;
 `;
 
 const TextField = styled.div`
   width: 40%;
-  height: 300px;
+  height: 100%;
   border-radius: 15px;
   overflow-y: scroll;
   padding: 10px;
-  border: 1px solid grey;
+  background-color: #f9f9f9;
   ::-webkit-scrollbar {
     display: none;
   }
@@ -320,35 +362,19 @@ const FeedBackSelect = styled.div`
   align-items: center;
 `;
 
-const ToggleInputContainer = styled.div`
-  display: flex;
-  width: 500px;
-  height: 100px;
-  display: ${(props) => (props.isToggled ? 'inherit' : 'none')};
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const SelectList = styled.select`
-  width: 170px;
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-bottom: 5px;
-  padding: 10px;
-  border-radius: 15px;
-  :focus {
-    outline: none;
-  }
-`;
-
 const SelectedLabel = styled.div`
   margin-left: 10px;
 `;
 
 const InputBox = styled.input`
-  margin: 10px;
-  width: 1400px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 99%;
   height: 100px;
+  border-radius: 25px;
+  border: none;
+  background-color: #f3f3f3;
   overflow-y: scroll;
   ::-webkit-scrollbar {
     display: none;
@@ -372,6 +398,7 @@ const Button = styled.button`
   margin-top: 5px;
   background-color: grey;
   :hover {
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.07);
     border: none;
   }
   a:active {
@@ -381,7 +408,7 @@ const Button = styled.button`
 
 const FeedBackList = styled.div`
   width: 40%;
-  height: 200px;
+  height: 100%;
   overflow-y: scroll;
   padding: 10px;
   ::-webkit-scrollbar {
@@ -397,23 +424,31 @@ const FeedBackBox = styled.div`
   /* align-items: center; */
 `;
 
-const SelectInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin: 10px;
-  border-radius: 8px;
-  border: 1px solid grey;
-  display: inherit;
-  :focus {
-    outline: none;
-  }
-`;
-
 const ChangeButton = styled.button`
   width: 30px;
   height: 30px;
   border-radius: 100px;
   border: 1px solid grey;
+  :focus {
+    outline: none;
+  }
+`;
+
+const FinalCommentContainer = styled.div`
+  width: 100%;
+  min-height: 200px;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const FinalComment = styled.input`
+  border: none;
+  border-radius: 25px;
+  width: 100%;
+  height: 80%;
+  background-color: #f6f6f6;
   :focus {
     outline: none;
   }

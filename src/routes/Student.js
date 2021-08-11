@@ -68,17 +68,16 @@ const Student = ({ match, history }) => {
   );
 };
 
-export default Student;
-
 const Container = styled.div`
+  padding: 2%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   border-radius: 15px;
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
-  width: 70%;
-  height: 80%;
+  width: 64%;
+  height: 73%;
 `;
 
 const TextContainer = styled.div`
@@ -158,3 +157,5 @@ const IdInput = styled.input`
 const StyledButton = styled(Button)`
   margin-bottom: 0;
 `;
+
+export { Student, Container, IdInput, StyledButton };

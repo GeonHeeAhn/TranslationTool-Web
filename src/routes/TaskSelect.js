@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button, Container } from 'routes/Menu';
-import Student from 'routes/Student';
+import { Student } from 'routes/Student';
 import dummyData from '../dummyData.js';
 import { Route, Link } from 'react-router-dom';
 
