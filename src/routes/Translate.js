@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import CreatableSelect from 'react-select/creatable';
 import Highlighter from 'react-highlight-words';
 import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
@@ -12,6 +13,7 @@ function Translate({ match }) {
   const [isToggled, setIsToggled] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [num, setNum] = useState(0);
+  const [value, setValue] = useState();
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -59,7 +61,7 @@ function Translate({ match }) {
   const sendFeedBack = () => {
     const FB = {
       id: FBId.current,
-      feedBack: selected,
+      feedBack: value.value,
       comment: inputText,
       selectedText: selectedText[nextId.current],
     };
@@ -69,59 +71,37 @@ function Translate({ match }) {
     setInputText('');
   };
 
-  const SelectBox = (props) => {
-    const handleChange = (e) => {
-      e.preventDefault();
-      setSelected(e.target.value);
-      console.log(selected);
-      if (e.target.value === '직접 입력') {
-        setIsToggled(true);
-      } else {
-        setIsToggled(false);
-      }
-    };
+  const SelectBox = ({ data }) => {
+    const [options, setOptions] = useState(data);
+
+    const handleChange = useCallback((inputValue) => setValue(inputValue), []);
+
+    const handleCreate = useCallback(
+      (inputValue) => {
+        const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+        setOptions([...options, newValue]);
+        setValue(newValue);
+      },
+      [options]
+    );
 
     return (
       <FeedBackSelect>
-        <SelectList onChange={handleChange}>
-          {props.data.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectList>
+        <div className="App">
+          <CreatableSelect
+            isClearable
+            value={value}
+            options={options}
+            onChange={handleChange}
+            onCreateOption={handleCreate}
+          />
+        </div>
         <SelectedLabel>: {selectedText[nextId.current].text}</SelectedLabel>
       </FeedBackSelect>
     );
   };
 
-  const SelectCT = (props) => {
-    const inputOnChange = (e) => {
-      e.preventDefault();
-      setInputValue(e.target.value);
-    };
-
-    const doneOnClick = () => {
-      setSelected(inputValue);
-      setIsToggled(false);
-      console.log(selected);
-      setInputValue('');
-    };
-
-    return (
-      <>
-        <SelectBox data={dummyData.options} value={selected} />
-        <ToggleInputContainer isToggled={isToggled}>
-          <SelectInput value={inputValue} onChange={inputOnChange} />
-          <Button type="submit" onClick={doneOnClick}>
-            Done
-          </Button>
-        </ToggleInputContainer>
-      </>
-    );
-  };
-
-  const Input = () => {
+  const InputLayout = () => {
     const onChange = (e) => {
       e.preventDefault();
       setInputText(e.target.value);
@@ -129,7 +109,7 @@ function Translate({ match }) {
 
     return (
       <InputContainer>
-        {SelectCT()}
+        <SelectBox data={dummyData.options} />
         <InputBox
           placeholder="Enter your feedback here"
           onChange={onChange}
@@ -261,7 +241,7 @@ function Translate({ match }) {
     <Container>
       <GlobalStyle />
       <TextBox />
-      {Input()}
+      {InputLayout()}
       <FeedBack list={feedBack} />
     </Container>
   );
