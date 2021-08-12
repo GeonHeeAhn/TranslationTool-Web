@@ -7,12 +7,12 @@ import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
 
-function Translate({ match }) {
+function Translate({ match, history }) {
   const [inputText, setInputText] = useState('');
   const [studentScript, setstudentScript] = useState([]);
   const [num, setNum] = useState(0);
   const [originalScript, setOriginalScript] = useState([]);
-  const [finalComment, setFinalComment] = useState();
+  const [finalComment, setFinalComment] = useState('');
   const [value, setValue] = useState();
   const [selectedText, setSelectedText] = useState([
     {
@@ -295,6 +295,7 @@ function Translate({ match }) {
         general_critique: finalComment,
       });
       window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
+      history.goBack();
     };
 
     const inputOnChange = (e) => {
@@ -309,12 +310,14 @@ function Translate({ match }) {
           onChange={CommentOnChange}
           value={finalComment}
         />
-        <StyledIdInput
-          placeholder="Enter your Id"
-          value={profId}
-          onChange={inputOnChange}
-        />
-        <Button onClick={onSubmit}>제출하기</Button>
+        <RowFlexBox>
+          <StyledIdInput
+            placeholder="Enter your Id"
+            value={profId}
+            onChange={inputOnChange}
+          />
+          <SubmitButton onClick={onSubmit}>제출하기</SubmitButton>
+        </RowFlexBox>
       </FinalCommentContainer>
     );
   };
@@ -323,10 +326,12 @@ function Translate({ match }) {
     <>
       <GlobalStyle />
       <StyledContainer>
-        <TextBox />
-        {InputLayout()}
-        <FeedBack list={feedBack} />
-        {BottomContainer()}
+        <Box>
+          <TextBox />
+          {InputLayout()}
+          <FeedBack list={feedBack} />
+          {BottomContainer()}
+        </Box>
       </StyledContainer>
     </>
   );
@@ -348,6 +353,16 @@ const GlobalStyle = createGlobalStyle`
     margin-bottom: 5px;
   }
 `;
+
+const Box = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+`;
+
 const StyledContainer = styled(Container)`
   height: 80%;
   overflow-y: auto;
@@ -357,7 +372,7 @@ const StyledContainer = styled(Container)`
 `;
 
 const TextContainer = styled.div`
-  margin-top: 5%;
+  margin-top: 3%;
   height: 300px;
   width: 100%;
   top: 0;
@@ -378,14 +393,17 @@ const InputContainer = styled.div`
 
 const FeedBackContainer = styled.div`
   width: 100%;
-  height: 300px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   background-color: #f9f9f9;
   border-radius: 25px;
+  margin-bottom: 20px;
 `;
 
 const FinalCommentContainer = styled.div`
+  margin-top: 20px;
+  margin-bottom: 20px;
   width: 100%;
   min-height: 200px;
   /* height: 35%; */
@@ -395,11 +413,12 @@ const FinalCommentContainer = styled.div`
 `;
 
 const FinalComment = styled.textarea`
+  margin-top: 20px;
   border: none;
   border-radius: 25px;
   width: 98%;
   padding: 15px;
-  height: 80%;
+  min-height: 150px;
   background-color: #f6f6f6;
   :focus {
     outline: none;
@@ -470,7 +489,7 @@ const Button = styled.button`
 
 const FeedBackList = styled.div`
   width: 40%;
-  height: 100%;
+  height: 95%;
   overflow-y: scroll;
   padding: 10px;
   ::-webkit-scrollbar {
@@ -483,7 +502,6 @@ const FeedBackBox = styled.div`
   flex-direction: column;
   justify-content: space-between;
   margin: 10px;
-  /* align-items: center; */
 `;
 
 const ChangeButton = styled.button`
@@ -499,4 +517,14 @@ const ChangeButton = styled.button`
 const StyledIdInput = styled(IdInput)`
   margin-top: 10px;
   margin-bottom: 10px;
+`;
+
+const RowFlexBox = styled.div`
+  display: flex;
+  align-items: center;
+  height: 200px;
+`;
+
+const SubmitButton = styled(StyledButton)`
+  background-color: #f6f6f6;
 `;
