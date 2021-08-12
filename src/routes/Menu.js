@@ -14,7 +14,7 @@ const Menu = () => {
   return (
     <Container>
       <Link to="/forstudent">
-        <Button>학생용</Button>
+        <Button disabled>학생용</Button>
       </Link>
       <Link to="/forprofessor">
         <Button>교수용</Button>

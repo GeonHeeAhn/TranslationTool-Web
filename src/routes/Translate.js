@@ -39,6 +39,15 @@ function Translate({ match }) {
     }
     let Arr = [];
     Arr = arr.filter((el) => el.scriptID === match.params.id);
+    if (
+      match.params.id === 'j3' ||
+      match.params.id === 'j4' ||
+      match.params.id === 'c2' ||
+      match.params.id === 'c4'
+    ) {
+      Arr = Arr.reverse();
+    }
+    console.log(Arr);
     setstudentScript(Arr);
   };
 
@@ -71,17 +80,21 @@ function Translate({ match }) {
     findScript();
   }, []);
 
-  const sendFeedBack = () => {
-    const FB = {
-      id: FBId.current,
-      feedBack: value.value,
-      comment: inputText,
-      selectedText: selectedText[nextId.current],
-    };
-    setFeedBack([...feedBack, FB]);
-    FBId.current += 1;
-    console.log(feedBack);
-    setInputText('');
+  const sendFeedBack = (e) => {
+    if (value === undefined) {
+      window.alert('카테고리를 선택해주세요.');
+    } else {
+      const FB = {
+        id: FBId.current,
+        feedBack: value.value,
+        comment: inputText,
+        selectedText: selectedText[nextId.current],
+      };
+      setFeedBack([...feedBack, FB]);
+      FBId.current += 1;
+      console.log(feedBack);
+      setInputText('');
+    }
   };
 
   const SelectBox = ({ data }) => {
@@ -138,7 +151,7 @@ function Translate({ match }) {
   const FeedBack = (id) => {
     const deleteElement = (id) => {
       setFeedBack(feedBack.filter((fb) => fb.id !== id));
-      // FBId.current -= 1;
+      FBId.current -= 1;
     };
 
     return (
@@ -171,7 +184,7 @@ function Translate({ match }) {
         .toString()
         .replace(/(\r\n\t|\n|\r\t)/gm, '');
       setIndexNumber(
-        parseInt((studentScript[num].translate_txt.indexOf(sentence) + 45) / 45)
+        parseInt((studentScript[num].translate_txt.indexOf(sentence) + 38) / 38)
       );
 
       console.log(sentence);
@@ -179,7 +192,7 @@ function Translate({ match }) {
       const select = {
         id: nextId.current,
         indexNum: parseInt(
-          (studentScript[num].translate_txt.indexOf(sentence) + 45) / 45
+          (studentScript[num].translate_txt.indexOf(sentence) + 38) / 38
         ),
         text: window.getSelection().toString(),
       };
@@ -189,8 +202,29 @@ function Translate({ match }) {
       console.log(selectedText);
     };
 
+    const originalDragAndSelect = (e) => {
+      e.preventDefault();
+      const sentence = window
+        .getSelection()
+        .toString()
+        .replace(/(\r\n\t|\n|\r\t)/gm, '');
+      setIndexNumber(
+        parseInt((originalScript.script.indexOf(sentence) + 38) / 38)
+      );
+
+      const select = {
+        id: nextId.current,
+        indexNum: parseInt((originalScript.script.indexOf(sentence) + 38) / 38),
+        text: window.getSelection().toString(),
+      };
+      console.log(originalScript.script.indexOf(sentence));
+      setSelectedText([...selectedText, select]);
+      nextId.current += 1;
+      console.log(selectedText);
+    };
+
     const WrappedBefore = wrapper(isOriginalScriptEmpty(), {
-      wrapOn: 45,
+      wrapOn: 38,
       continuationIndent: '\n',
     });
 
@@ -218,7 +252,7 @@ function Translate({ match }) {
     return (
       <TextContainer>
         <ChangeButton onClick={minusId}>-</ChangeButton>
-        <TextField>
+        <TextField onClick={originalDragAndSelect}>
           {WrappedBefore.split('\n').map((line) => {
             return (
               <span>
@@ -229,12 +263,6 @@ function Translate({ match }) {
           })}
         </TextField>
         <TextField className="TranslateField" onClick={dragAndSelect}>
-          {/* <Highlighter
-            highlightClassName="TranslateField"
-            searchWords={[selectedText[nextId.current].text]}
-            autoEscape={true}
-            textToHighlight={dummyData.translate_data[id].output_data}
-          /> */}
           {WrappedAfter.split('\n').map((line) => {
             return (
               <span>
@@ -261,7 +289,6 @@ function Translate({ match }) {
       await dbService.collection('test').add({
         student_ID: studentScript[0].studentID,
         script_ID: studentScript[0].scriptID,
-        //translate_txt: transText, //원문?필요한가?
         professor_name: profId,
         professor_ID: authService.currentUser.uid,
         feedBack: feedBack,
@@ -282,7 +309,7 @@ function Translate({ match }) {
           onChange={CommentOnChange}
           value={finalComment}
         />
-        <IdInput
+        <StyledIdInput
           placeholder="Enter your Id"
           value={profId}
           onChange={inputOnChange}
@@ -309,10 +336,10 @@ export default React.memo(Translate);
 
 const GlobalStyle = createGlobalStyle`
   body{
-    overflow-y: scroll;
+    overflow-y: scroll; 
     ::-webkit-scrollbar {
     display: none;
-   }
+    } 
   }
   .css-2b097c-container {
     width: 170px;
@@ -322,6 +349,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 const StyledContainer = styled(Container)`
+  height: 80%;
   overflow-y: auto;
   ::-webkit-scrollbar {
     display: none;
@@ -330,9 +358,9 @@ const StyledContainer = styled(Container)`
 
 const TextContainer = styled.div`
   margin-top: 5%;
-  min-height: 300px;
+  height: 300px;
   width: 100%;
-  height: 40%;
+  top: 0;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -341,7 +369,7 @@ const TextContainer = styled.div`
 
 const InputContainer = styled.div`
   width: 100%;
-  height: 35%;
+  height: 300px;
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
@@ -350,17 +378,37 @@ const InputContainer = styled.div`
 
 const FeedBackContainer = styled.div`
   width: 100%;
-  /* min-height: 200px; */
-  height: 50%;
+  height: 300px;
   display: flex;
   align-items: center;
   background-color: #f9f9f9;
   border-radius: 25px;
 `;
 
+const FinalCommentContainer = styled.div`
+  width: 100%;
+  min-height: 200px;
+  /* height: 35%; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const FinalComment = styled.textarea`
+  border: none;
+  border-radius: 25px;
+  width: 98%;
+  padding: 15px;
+  height: 80%;
+  background-color: #f6f6f6;
+  :focus {
+    outline: none;
+  }
+`;
+
 const TextField = styled.div`
   width: 40%;
-  height: 100%;
+  height: 300px;
   border-radius: 15px;
   overflow-y: scroll;
   padding: 10px;
@@ -404,7 +452,7 @@ const Button = styled.button`
   padding-top: 10px;
   padding-bottom: 10px;
   border-radius: 15px;
-  width: auto;
+  width: 100px;
   height: 30px;
   border: none;
   margin-bottom: 10px;
@@ -448,22 +496,7 @@ const ChangeButton = styled.button`
   }
 `;
 
-const FinalCommentContainer = styled.div`
-  width: 100%;
-  min-height: 200px;
-  height: 35%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
-const FinalComment = styled.input`
-  border: none;
-  border-radius: 25px;
-  width: 100%;
-  height: 80%;
-  background-color: #f6f6f6;
-  :focus {
-    outline: none;
-  }
+const StyledIdInput = styled(IdInput)`
+  margin-top: 10px;
+  margin-bottom: 10px;
 `;
