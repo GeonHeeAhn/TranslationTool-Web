@@ -6,14 +6,246 @@ import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
+import { Doughnut } from 'react-chartjs-2';
+
+const BottomContainer = ({
+  studentScript,
+  profId,
+  feedBack,
+  finalComment,
+  setFinalComment,
+  setProfId,
+  history,
+}) => {
+  const CommentOnChange = (e) => {
+    e.preventDefault();
+    setFinalComment(e.target.value);
+  };
+
+  const onSubmit = async () => {
+    await dbService.collection('professor').add({
+      student_ID: studentScript[0].studentID,
+      script_ID: studentScript[0].scriptID,
+      professor_name: profId,
+      professor_ID: authService.currentUser.uid,
+      feedBack: feedBack,
+      general_critique: finalComment,
+    });
+    window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
+    history.goBack();
+  };
+
+  const inputOnChange = (e) => {
+    setProfId(e.target.value);
+  };
+
+  return (
+    <FinalCommentContainer>
+      <div>총평</div>
+      <FinalComment
+        placeholder="총평을 적어주세요"
+        onChange={CommentOnChange}
+        value={finalComment}
+      />
+      <RowFlexBox>
+        <StyledIdInput
+          placeholder="Enter your Id"
+          value={profId}
+          onChange={inputOnChange}
+        />
+        <SubmitButton onClick={onSubmit}>제출하기</SubmitButton>
+      </RowFlexBox>
+    </FinalCommentContainer>
+  );
+};
+
+const TextBox = ({
+  studentScript,
+  setIndexNumber,
+  num,
+  nextId,
+  setSelectedText,
+  selectedText,
+  originalScript,
+  setNum,
+  isOriginalScriptEmpty,
+  IsStudentScriptEmpty,
+}) => {
+  const dragAndSelect = (e) => {
+    console.log(studentScript);
+    e.preventDefault();
+    const sentence = window
+      .getSelection()
+      .toString()
+      .replace(/(\r\n\t|\n|\r\t)/gm, '');
+    setIndexNumber(
+      parseInt((studentScript[num].translate_txt.indexOf(sentence) + 38) / 38)
+    );
+
+    console.log(sentence);
+
+    const select = {
+      id: nextId.current,
+      indexNum: parseInt(
+        (studentScript[num].translate_txt.indexOf(sentence) + 38) / 38
+      ),
+      text: window.getSelection().toString(),
+    };
+    console.log(studentScript[num].translate_txt.indexOf(sentence));
+    setSelectedText([...selectedText, select]);
+    nextId.current += 1;
+    console.log(selectedText);
+  };
+
+  const originalDragAndSelect = (e) => {
+    e.preventDefault();
+    const sentence = window
+      .getSelection()
+      .toString()
+      .replace(/(\r\n\t|\n|\r\t)/gm, '');
+    setIndexNumber(
+      parseInt((originalScript.script.indexOf(sentence) + 38) / 38)
+    );
+
+    const select = {
+      id: nextId.current,
+      indexNum: parseInt((originalScript.script.indexOf(sentence) + 38) / 38),
+      text: window.getSelection().toString(),
+    };
+    console.log(originalScript.script.indexOf(sentence));
+    setSelectedText([...selectedText, select]);
+    nextId.current += 1;
+    console.log(selectedText);
+  };
+
+  const WrappedBefore = wrapper(isOriginalScriptEmpty(), {
+    wrapOn: 38,
+    continuationIndent: '\n',
+  });
+
+  const WrappedAfter = wrapper(IsStudentScriptEmpty(), {
+    wrapOn: 38,
+    continuationIndent: '\n',
+  });
+
+  const plusId = () => {
+    if (num === studentScript.length - 1) {
+      alert('더 이상 뒤로 갈 수 없습니다.');
+    } else {
+      setNum(num + 1);
+    }
+  };
+
+  const minusId = () => {
+    if (num === 0) {
+      alert('더 이상 앞으로 갈 수 없습니다.');
+    } else {
+      setNum(num - 1);
+    }
+  };
+
+  return (
+    <TextContainer>
+      <ChangeButton onClick={minusId}>-</ChangeButton>
+      <TextField onClick={originalDragAndSelect}>
+        {WrappedBefore.split('\n').map((line) => {
+          return (
+            <span>
+              {line}
+              <br />
+            </span>
+          );
+        })}
+      </TextField>
+      <TextField className="TranslateField" onClick={dragAndSelect}>
+        {WrappedAfter.split('\n').map((line) => {
+          return (
+            <span>
+              {line}
+              <br />
+            </span>
+          );
+        })}
+      </TextField>
+      <ChangeButton onClick={plusId}>+</ChangeButton>
+    </TextContainer>
+  );
+};
+
+const SelectBox = ({
+  setValue,
+  setOptions,
+  options,
+  value,
+  nextId,
+  selectedText,
+}) => {
+  const handleChange = useCallback((inputValue) => setValue(inputValue), []);
+
+  const handleCreate = useCallback(
+    (inputValue) => {
+      const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+      setOptions([...options, newValue]);
+      setValue(newValue);
+    },
+    [options]
+  );
+
+  return (
+    <FeedBackSelect>
+      <div className="App">
+        <CreatableSelect
+          isClearable
+          value={value}
+          options={options}
+          onChange={handleChange}
+          onCreateOption={handleCreate}
+        />
+      </div>
+      <SelectedLabel>: {selectedText[nextId.current].text}</SelectedLabel>
+    </FeedBackSelect>
+  );
+};
+
+const FeedBack = ({ id, setFeedBack, feedBack, FBId }) => {
+  const deleteElement = (id) => {
+    setFeedBack(feedBack.filter((fb) => fb.id !== id));
+    FBId.current -= 1;
+  };
+
+  return (
+    <FeedBackContainer>
+      <FeedBackList>
+        {feedBack.map((el) => (
+          <FeedBackBox key={el.id}>
+            <div>
+              {el.id} . {el.feedBack} : {el.comment}
+            </div>
+            <div>
+              {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
+              <Button onClick={() => deleteElement(el.id)}>Delete</Button>
+            </div>
+          </FeedBackBox>
+        ))}
+      </FeedBackList>
+    </FeedBackContainer>
+  );
+};
+
+const StudentInfoBox = ({ IsStudentNameEmpty }) => {
+  return <StudentName>제출자 : {IsStudentNameEmpty()}</StudentName>;
+};
 
 function Translate({ match, history }) {
   const [inputText, setInputText] = useState('');
   const [studentScript, setstudentScript] = useState([]);
   const [num, setNum] = useState(0);
+  const [profId, setProfId] = useState('');
+  const [indexNumber, setIndexNumber] = useState();
   const [originalScript, setOriginalScript] = useState([]);
   const [finalComment, setFinalComment] = useState('');
   const [value, setValue] = useState();
+  const [options, setOptions] = useState(dummyData.options);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -59,6 +291,14 @@ function Translate({ match, history }) {
     }
   };
 
+  const IsStudentNameEmpty = () => {
+    if (studentScript.length === 0) {
+      return 'loading';
+    } else {
+      return studentScript[num].studentID;
+    }
+  };
+
   const findScript = () => {
     setOriginalScript(
       dummyData.student_data.find((el) => el.id === match.params.id)
@@ -78,6 +318,7 @@ function Translate({ match, history }) {
     getScripts();
     IsStudentScriptEmpty();
     findScript();
+    IsStudentNameEmpty();
   }, []);
 
   const sendFeedBack = (e) => {
@@ -91,40 +332,11 @@ function Translate({ match, history }) {
         selectedText: selectedText[nextId.current],
       };
       setFeedBack([...feedBack, FB]);
+      console.log(value.value);
       FBId.current += 1;
       console.log(feedBack);
       setInputText('');
     }
-  };
-
-  const SelectBox = ({ data }) => {
-    const [options, setOptions] = useState(data);
-
-    const handleChange = useCallback((inputValue) => setValue(inputValue), []);
-
-    const handleCreate = useCallback(
-      (inputValue) => {
-        const newValue = { value: inputValue.toLowerCase(), label: inputValue };
-        setOptions([...options, newValue]);
-        setValue(newValue);
-      },
-      [options]
-    );
-
-    return (
-      <FeedBackSelect>
-        <div className="App">
-          <CreatableSelect
-            isClearable
-            value={value}
-            options={options}
-            onChange={handleChange}
-            onCreateOption={handleCreate}
-          />
-        </div>
-        <SelectedLabel>: {selectedText[nextId.current].text}</SelectedLabel>
-      </FeedBackSelect>
-    );
   };
 
   const InputLayout = () => {
@@ -135,7 +347,14 @@ function Translate({ match, history }) {
 
     return (
       <InputContainer>
-        <SelectBox data={dummyData.options} />
+        <SelectBox
+          setValue={setValue}
+          setOptions={setOptions}
+          options={options}
+          value={value}
+          nextId={nextId}
+          selectedText={selectedText}
+        />
         <InputBox
           placeholder="Enter your feedback here"
           onChange={onChange}
@@ -148,189 +367,40 @@ function Translate({ match, history }) {
     );
   };
 
-  const FeedBack = (id) => {
-    const deleteElement = (id) => {
-      setFeedBack(feedBack.filter((fb) => fb.id !== id));
-      FBId.current -= 1;
-    };
-
-    return (
-      <FeedBackContainer>
-        <FeedBackList>
-          {feedBack.map((el) => (
-            <FeedBackBox key={el.id}>
-              <div>
-                {el.id} . {el.feedBack} : {el.comment}
-              </div>
-              <div>
-                {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-              </div>
-              <Button onClick={() => deleteElement(el.id)}>Delete</Button>
-            </FeedBackBox>
-          ))}
-        </FeedBackList>
-      </FeedBackContainer>
-    );
-  };
-
-  const TextBox = () => {
-    const [id, setId] = useState(0);
-    const [indexNumber, setIndexNumber] = useState();
-    const dragAndSelect = (e) => {
-      console.log(studentScript);
-      e.preventDefault();
-      const sentence = window
-        .getSelection()
-        .toString()
-        .replace(/(\r\n\t|\n|\r\t)/gm, '');
-      setIndexNumber(
-        parseInt((studentScript[num].translate_txt.indexOf(sentence) + 38) / 38)
-      );
-
-      console.log(sentence);
-
-      const select = {
-        id: nextId.current,
-        indexNum: parseInt(
-          (studentScript[num].translate_txt.indexOf(sentence) + 38) / 38
-        ),
-        text: window.getSelection().toString(),
-      };
-      console.log(studentScript[num].translate_txt.indexOf(sentence));
-      setSelectedText([...selectedText, select]);
-      nextId.current += 1;
-      console.log(selectedText);
-    };
-
-    const originalDragAndSelect = (e) => {
-      e.preventDefault();
-      const sentence = window
-        .getSelection()
-        .toString()
-        .replace(/(\r\n\t|\n|\r\t)/gm, '');
-      setIndexNumber(
-        parseInt((originalScript.script.indexOf(sentence) + 38) / 38)
-      );
-
-      const select = {
-        id: nextId.current,
-        indexNum: parseInt((originalScript.script.indexOf(sentence) + 38) / 38),
-        text: window.getSelection().toString(),
-      };
-      console.log(originalScript.script.indexOf(sentence));
-      setSelectedText([...selectedText, select]);
-      nextId.current += 1;
-      console.log(selectedText);
-    };
-
-    const WrappedBefore = wrapper(isOriginalScriptEmpty(), {
-      wrapOn: 38,
-      continuationIndent: '\n',
-    });
-
-    const WrappedAfter = wrapper(IsStudentScriptEmpty(), {
-      wrapOn: 38,
-      continuationIndent: '\n',
-    });
-
-    const plusId = () => {
-      if (num === studentScript.length - 1) {
-        alert('더 이상 뒤로 갈 수 없습니다.');
-      } else {
-        setNum(num + 1);
-      }
-    };
-
-    const minusId = () => {
-      if (num === 0) {
-        alert('더 이상 앞으로 갈 수 없습니다.');
-      } else {
-        setNum(num - 1);
-      }
-    };
-
-    return (
-      <TextContainer>
-        <ChangeButton onClick={minusId}>-</ChangeButton>
-        <TextField onClick={originalDragAndSelect}>
-          {WrappedBefore.split('\n').map((line) => {
-            return (
-              <span>
-                {line}
-                <br />
-              </span>
-            );
-          })}
-        </TextField>
-        <TextField className="TranslateField" onClick={dragAndSelect}>
-          {WrappedAfter.split('\n').map((line) => {
-            return (
-              <span>
-                {line}
-                <br />
-              </span>
-            );
-          })}
-        </TextField>
-        <ChangeButton onClick={plusId}>+</ChangeButton>
-      </TextContainer>
-    );
-  };
-
-  const BottomContainer = () => {
-    const [profId, setProfId] = useState('');
-    const CommentOnChange = (e) => {
-      e.preventDefault();
-      setFinalComment(e.target.value);
-    };
-
-    const onSubmit = async () => {
-      console.log('이거지정');
-      await dbService.collection('test').add({
-        student_ID: studentScript[0].studentID,
-        script_ID: studentScript[0].scriptID,
-        professor_name: profId,
-        professor_ID: authService.currentUser.uid,
-        feedBack: feedBack,
-        general_critique: finalComment,
-      });
-      window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
-      history.goBack();
-    };
-
-    const inputOnChange = (e) => {
-      setProfId(e.target.value);
-    };
-
-    return (
-      <FinalCommentContainer>
-        <div>총평</div>
-        <FinalComment
-          placeholder="총평을 적어주세요"
-          onChange={CommentOnChange}
-          value={finalComment}
-        />
-        <RowFlexBox>
-          <StyledIdInput
-            placeholder="Enter your Id"
-            value={profId}
-            onChange={inputOnChange}
-          />
-          <SubmitButton onClick={onSubmit}>제출하기</SubmitButton>
-        </RowFlexBox>
-      </FinalCommentContainer>
-    );
-  };
-
   return (
     <>
       <GlobalStyle />
       <StyledContainer>
         <Box>
-          <TextBox />
+          <StudentInfoBox IsStudentNameEmpty={IsStudentNameEmpty} />
+          <TextBox
+            studentScript={studentScript}
+            setIndexNumber={setIndexNumber}
+            num={num}
+            nextId={nextId}
+            setSelectedText={setSelectedText}
+            selectedText={selectedText}
+            originalScript={originalScript}
+            setNum={setNum}
+            isOriginalScriptEmpty={isOriginalScriptEmpty}
+            IsStudentScriptEmpty={IsStudentScriptEmpty}
+          />
           {InputLayout()}
-          <FeedBack list={feedBack} />
-          {BottomContainer()}
+          <FeedBack
+            list={feedBack}
+            setFeedBack={setFeedBack}
+            feedBack={feedBack}
+            FBId={FBId}
+          />
+          {BottomContainer({
+            studentScript,
+            profId,
+            feedBack,
+            finalComment,
+            setFinalComment,
+            setProfId,
+            history,
+          })}
         </Box>
       </StyledContainer>
     </>
@@ -345,6 +415,10 @@ const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar {
     display: none;
     } 
+  }
+  canvas {
+    height: 250px;
+    width: 250px;
   }
   .css-2b097c-container {
     width: 170px;
@@ -488,7 +562,7 @@ const Button = styled.button`
 `;
 
 const FeedBackList = styled.div`
-  width: 40%;
+  width: 90%;
   height: 95%;
   overflow-y: scroll;
   padding: 10px;
@@ -527,4 +601,9 @@ const RowFlexBox = styled.div`
 
 const SubmitButton = styled(StyledButton)`
   background-color: #f6f6f6;
+`;
+
+const StudentName = styled.div`
+  padding: 5px;
+  text-align: center;
 `;
