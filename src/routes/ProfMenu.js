@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button, Container } from 'routes/Menu';
-import Translate from 'routes/Translate';
+import { Translate } from 'routes/Translate';
 import { Route, Link } from 'react-router-dom';
 import { dbService } from 'fbase.js';
 import dummyData from '../dummyData.js';

@@ -5,7 +5,7 @@ import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
-import { Doughnut, Bar } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 
 const Chart = ({ options, chartValue }) => {
   let rankColor = [
@@ -274,7 +274,9 @@ const FeedBack = ({
   chartValue,
   setChartValue,
 }) => {
-  const deleteElement = (id) => {
+  const deleteElement = (id, comment) => {
+    console.log(id, comment, chartValue, options, setChartValue);
+    deleteChart(comment, chartValue, options, setChartValue);
     setFeedBack(feedBack.filter((fb) => fb.id !== id));
     FBId.current -= 1;
   };
@@ -289,7 +291,19 @@ const FeedBack = ({
             </div>
             <div>
               {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-              <Button onClick={() => deleteElement(el.id)}>Delete</Button>
+              <Button
+                onClick={() =>
+                  deleteElement(
+                    el.id,
+                    el.feedBack,
+                    chartValue,
+                    options,
+                    setChartValue
+                  )
+                }
+              >
+                Delete
+              </Button>
             </div>
           </FeedBackBox>
         ))}
@@ -303,10 +317,10 @@ const StudentInfoBox = ({ IsStudentNameEmpty }) => {
   return <StudentName>제출자 : {IsStudentNameEmpty()}</StudentName>;
 };
 
-const deleteChart = ({ feedBack, chartValue, options, setChartValue }) => {
+const deleteChart = (comment, chartValue, options, setChartValue) => {
   let arr = chartValue;
   const targetIdx = options.findIndex((item) => {
-    return item.label === feedBack;
+    return item.label === comment;
   });
   targetIdx !== undefined ? (arr[targetIdx] -= 1) : (arr[8] -= 1);
   setChartValue(arr);
@@ -497,8 +511,6 @@ function Translate({ match, history }) {
     </>
   );
 }
-
-export default React.memo(Translate);
 
 const GlobalStyle = createGlobalStyle`
   body{
@@ -701,3 +713,15 @@ const StudentName = styled.div`
   padding: 5px;
   text-align: center;
 `;
+
+export {
+  Translate,
+  StyledChart,
+  StyledContainer,
+  TextContainer,
+  FeedBackContainer,
+  TextField,
+  FeedBackList,
+  FeedBackBox,
+  Box,
+};

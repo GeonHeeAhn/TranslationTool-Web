@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import Auth from '../routes/Auth';
-import Translate from '../routes/Translate';
+import { Translate } from '../routes/Translate';
 import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
 import { useState } from 'react';
