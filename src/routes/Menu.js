@@ -13,8 +13,19 @@ const Menu = () => {
 
   return (
     <Container>
+      <Header style={{ position: 'absolute', top: 0 }}>
+        <Link to="/mypage">
+          <ProfileIcon>
+            <img
+              src={process.env.PUBLIC_URL + '/design/person_icon.png'}
+              alt="profile icon"
+              style={{ height: '30px', width: '30px' }}
+            />
+          </ProfileIcon>
+        </Link>
+      </Header>
       <Link to="/forstudent">
-        <Button disabled>학생용</Button>
+        <Button>학생용</Button>
       </Link>
       <Link to="/forprofessor">
         <Button>교수용</Button>
@@ -60,6 +71,23 @@ const Button = styled.button`
     box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.07);
     color: black;
   }
+`;
+
+const Header = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  height: 40px;
+`;
+
+const ProfileIcon = styled.div`
+  margin-top: 10px;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
 `;
 
 export { Menu, Button, Container };

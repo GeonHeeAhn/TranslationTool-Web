@@ -1,12 +1,69 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
-import Highlighter from 'react-highlight-words';
 import { wrapper } from 'text-wrapper';
 import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
+
+const Chart = ({ options, chartValue }) => {
+  let rankColor = [
+    '#283A61',
+    '#A3B8E6',
+    '#5B86E0',
+    '#454E61',
+    '#4767AD',
+    '#A8D0E6',
+    '#2A4E61',
+    '#4A8AAD',
+    '#475861',
+  ];
+  let optionsArray = [];
+  optionsArray = options.map((el) => el.label);
+  const data = {
+    labels: optionsArray,
+    datasets: [
+      {
+        backgroundColor: rankColor,
+        borderColor: rankColor,
+        borderWidth: 1,
+        hoverBackgroundColor: rankColor,
+        hoverBorderColor: rankColor,
+        data: chartValue,
+      },
+    ],
+  };
+
+  const graphOption = {
+    legend: {
+      display: false,
+    },
+    parsing: {
+      key: 'data',
+    },
+    plugins: {
+      legend: {
+        display: true,
+      },
+    },
+    animation: {
+      duration: 0,
+    },
+    maintainAspectRatio: false,
+    responsive: false,
+  };
+
+  return (
+    <StyledChart
+      data={data}
+      width={300}
+      height={300}
+      options={graphOption}
+      aspectRatio={1}
+    />
+  );
+};
 
 const BottomContainer = ({
   studentScript,
@@ -24,7 +81,8 @@ const BottomContainer = ({
 
   const onSubmit = async () => {
     await dbService.collection('professor').add({
-      student_ID: studentScript[0].studentID,
+      student_Name: studentScript[0].studentID,
+      student_ID: studentScript[0].userID,
       script_ID: studentScript[0].scriptID,
       professor_name: profId,
       professor_ID: authService.currentUser.uid,
@@ -207,7 +265,15 @@ const SelectBox = ({
   );
 };
 
-const FeedBack = ({ id, setFeedBack, feedBack, FBId }) => {
+const FeedBack = ({
+  id,
+  setFeedBack,
+  feedBack,
+  FBId,
+  options,
+  chartValue,
+  setChartValue,
+}) => {
   const deleteElement = (id) => {
     setFeedBack(feedBack.filter((fb) => fb.id !== id));
     FBId.current -= 1;
@@ -228,12 +294,22 @@ const FeedBack = ({ id, setFeedBack, feedBack, FBId }) => {
           </FeedBackBox>
         ))}
       </FeedBackList>
+      <Chart options={options} chartValue={chartValue} />
     </FeedBackContainer>
   );
 };
 
 const StudentInfoBox = ({ IsStudentNameEmpty }) => {
   return <StudentName>제출자 : {IsStudentNameEmpty()}</StudentName>;
+};
+
+const deleteChart = ({ feedBack, chartValue, options, setChartValue }) => {
+  let arr = chartValue;
+  const targetIdx = options.findIndex((item) => {
+    return item.label === feedBack;
+  });
+  targetIdx !== undefined ? (arr[targetIdx] -= 1) : (arr[8] -= 1);
+  setChartValue(arr);
 };
 
 function Translate({ match, history }) {
@@ -246,6 +322,7 @@ function Translate({ match, history }) {
   const [finalComment, setFinalComment] = useState('');
   const [value, setValue] = useState();
   const [options, setOptions] = useState(dummyData.options);
+  const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -264,7 +341,7 @@ function Translate({ match, history }) {
   const nextId = useRef(0);
   const FBId = useRef(1);
   const getScripts = async () => {
-    const dbScript = await dbService.collection('student').get();
+    const dbScript = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push({ ...document.data(), id: document.id });
@@ -335,8 +412,19 @@ function Translate({ match, history }) {
       console.log(value.value);
       FBId.current += 1;
       console.log(feedBack);
+      updateChart(value.value);
       setInputText('');
     }
+  };
+
+  const updateChart = (value1) => {
+    let arr = chartValue;
+    const targetIdx = options.findIndex((item) => {
+      return item.label === value1;
+    });
+    console.log(targetIdx);
+    targetIdx !== undefined ? (arr[targetIdx] += 1) : (arr[8] += 1);
+    setChartValue(arr);
   };
 
   const InputLayout = () => {
@@ -391,6 +479,9 @@ function Translate({ match, history }) {
             setFeedBack={setFeedBack}
             feedBack={feedBack}
             FBId={FBId}
+            options={options}
+            chartValue={chartValue}
+            setChartValue={setChartValue}
           />
           {BottomContainer({
             studentScript,
@@ -416,16 +507,18 @@ const GlobalStyle = createGlobalStyle`
     display: none;
     } 
   }
-  canvas {
-    height: 250px;
-    width: 250px;
-  }
   .css-2b097c-container {
     width: 170px;
     margin-top: 10px;
     margin-left: 10px;
     margin-bottom: 5px;
   }
+`;
+
+const StyledChart = styled(Doughnut)`
+  width: 400px;
+  height: 400px;
+  margin-right: 150px;
 `;
 
 const Box = styled.div`
@@ -469,6 +562,7 @@ const FeedBackContainer = styled.div`
   width: 100%;
   min-height: 300px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   background-color: #f9f9f9;
   border-radius: 25px;
@@ -562,7 +656,7 @@ const Button = styled.button`
 `;
 
 const FeedBackList = styled.div`
-  width: 90%;
+  width: 50%;
   height: 95%;
   overflow-y: scroll;
   padding: 10px;

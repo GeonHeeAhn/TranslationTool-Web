@@ -1,13 +1,12 @@
 import React from 'react';
 import { HashRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import Auth from '../routes/Auth';
-import Home from '../routes/Home';
 import Translate from '../routes/Translate';
-import Student from '../routes/Student';
 import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
 import { useState } from 'react';
 import profMenu from '../routes/ProfMenu';
+import MyPage from '../routes/MyPage';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
@@ -15,6 +14,7 @@ const AppRouter = ({ isLoggedIn }) => {
       <Link to="/" />
       <Link to="/professor" />
       <Link to="/student" />
+      <Link to="/mypage" />
       {isLoggedIn ? (
         <>
           <Route exact path="/" component={Menu} />
@@ -22,6 +22,7 @@ const AppRouter = ({ isLoggedIn }) => {
             <Route path="/professor" component={Translate} />
             <Route path="/forstudent" component={TaskSelect} />
             <Route path="/forprofessor" component={profMenu} />
+            <Route path="/myPage" component={MyPage} />
           </Switch>
         </>
       ) : (
