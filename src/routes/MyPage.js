@@ -5,7 +5,7 @@ import MyFeedBack from 'routes/MyFeedBack';
 import { dbService, authService } from 'fbase.js';
 import { Route, Link } from 'react-router-dom';
 
-const MyPageMenu = ({ match, myTask, setMyTask }) => {
+const MyPageMenu = (match, myTask, setMyTask) => {
   const getTaskList = async () => {
     const TaskList = await dbService.collection('professor').get();
     const arr = [];
@@ -19,6 +19,7 @@ const MyPageMenu = ({ match, myTask, setMyTask }) => {
         scriptID: '작성한 과제가 없습니다.',
       });
     }
+    console.log(Arr);
     setMyTask(Arr);
   };
 
@@ -50,8 +51,8 @@ const MyPage = ({ match }) => {
         exact
         path={match.path}
         component={MyPageMenu}
-        setMyTask={setMyTask}
         myTask={myTask}
+        setMyTask={setMyTask}
       />
       <Route
         path={`${match.path}/:id`}

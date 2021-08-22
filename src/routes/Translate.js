@@ -6,8 +6,11 @@ import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
 import { Doughnut } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import 'chartjs-plugin-labels';
 
 const Chart = ({ options, chartValue }) => {
+  // Doughnut.plugins.register(ChartDataLabels);
   let rankColor = [
     '#283A61',
     '#A3B8E6',
@@ -46,6 +49,17 @@ const Chart = ({ options, chartValue }) => {
       legend: {
         display: true,
       },
+      datalabels: {
+        display: true,
+        color: 'white',
+        render: 'label',
+      },
+      labels: {
+        fontSize: 11,
+        fontColor: '#fff',
+        position: 'default',
+        render: 'label',
+      },
     },
     animation: {
       duration: 0,
@@ -61,6 +75,7 @@ const Chart = ({ options, chartValue }) => {
       height={300}
       options={graphOption}
       aspectRatio={1}
+      // plugins={[ChartDataLabels]}
     />
   );
 };
@@ -81,8 +96,8 @@ const BottomContainer = ({
 
   const onSubmit = async () => {
     await dbService.collection('professor').add({
-      student_Name: studentScript[0].studentID,
-      student_ID: studentScript[0].userID,
+      // student_Name: studentScript[0].studentID,
+      student_ID: studentScript[0].studentID,
       script_ID: studentScript[0].scriptID,
       professor_name: profId,
       professor_ID: authService.currentUser.uid,
@@ -139,8 +154,6 @@ const TextBox = ({
     setIndexNumber(
       parseInt((studentScript[num].translate_txt.indexOf(sentence) + 38) / 38)
     );
-
-    console.log(sentence);
 
     const select = {
       id: nextId.current,
@@ -322,7 +335,7 @@ const deleteChart = (comment, chartValue, options, setChartValue) => {
   const targetIdx = options.findIndex((item) => {
     return item.label === comment;
   });
-  targetIdx !== undefined ? (arr[targetIdx] -= 1) : (arr[8] -= 1);
+  arr[targetIdx] -= 1;
   setChartValue(arr);
 };
 
@@ -336,7 +349,7 @@ function Translate({ match, history }) {
   const [finalComment, setFinalComment] = useState('');
   const [value, setValue] = useState();
   const [options, setOptions] = useState(dummyData.options);
-  const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -355,7 +368,7 @@ function Translate({ match, history }) {
   const nextId = useRef(0);
   const FBId = useRef(1);
   const getScripts = async () => {
-    const dbScript = await dbService.collection('studentTest').get();
+    const dbScript = await dbService.collection('student').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push({ ...document.data(), id: document.id });
@@ -436,8 +449,15 @@ function Translate({ match, history }) {
     const targetIdx = options.findIndex((item) => {
       return item.label === value1;
     });
-    console.log(targetIdx);
-    targetIdx !== undefined ? (arr[targetIdx] += 1) : (arr[8] += 1);
+    if (targetIdx <= 7) {
+      arr[targetIdx] += 1;
+    } else {
+      if (arr.length > targetIdx) {
+        arr[targetIdx] += 1;
+      } else {
+        arr.push(1);
+      }
+    }
     setChartValue(arr);
   };
 
@@ -457,6 +477,10 @@ function Translate({ match, history }) {
           nextId={nextId}
           selectedText={selectedText}
         />
+        <UnderLabel>
+          새로운 항목을 원하실 경우, 위 항목선택박스에 항목이름을 직접 입력한
+          뒤, 엔터를 눌러주세요.
+        </UnderLabel>
         <InputBox
           placeholder="Enter your feedback here"
           onChange={onChange}
@@ -712,6 +736,12 @@ const SubmitButton = styled(StyledButton)`
 const StudentName = styled.div`
   padding: 5px;
   text-align: center;
+`;
+
+const UnderLabel = styled.div`
+  text-align: left;
+  margin: 10px;
+  font-size: 8px;
 `;
 
 export {

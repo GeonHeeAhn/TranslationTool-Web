@@ -7,6 +7,7 @@ import { Menu } from '../routes/Menu';
 import { useState } from 'react';
 import profMenu from '../routes/ProfMenu';
 import MyPage from '../routes/MyPage';
+import Header from '../routes/Header';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
@@ -17,6 +18,7 @@ const AppRouter = ({ isLoggedIn }) => {
       <Link to="/mypage" />
       {isLoggedIn ? (
         <>
+          <Route path="/" component={Header} />
           <Route exact path="/" component={Menu} />
           <Switch>
             <Route path="/professor" component={Translate} />

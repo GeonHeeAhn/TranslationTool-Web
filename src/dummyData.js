@@ -66,7 +66,6 @@ const dummyData = {
     { value: '표현 어색', label: '표현 어색' },
     { value: '문제 부적합', label: '문제 부적합' },
     { value: '칭찬', label: '칭찬' },
-    { value: '기타', label: '기타' },
   ],
   translate_data: [
     {
