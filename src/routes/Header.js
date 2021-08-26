@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <Container>
       <Link to="/mypage">
-        <ProfileIcon disabled>
+        <ProfileIcon>
           <img
             src={process.env.PUBLIC_URL + '/design/person_icon.png'}
             alt="profile icon"

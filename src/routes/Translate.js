@@ -7,10 +7,10 @@ import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
 import { Doughnut } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import 'chartjs-plugin-labels';
+import labels from 'chartjs-plugin-labels';
+// import { Doughnut } from 'chart.js';
 
-const Chart = ({ options, chartValue }) => {
-  // Doughnut.plugins.register(ChartDataLabels);
+const Chart1 = ({ options, chartValue }) => {
   let rankColor = [
     '#283A61',
     '#A3B8E6',
@@ -49,17 +49,23 @@ const Chart = ({ options, chartValue }) => {
       legend: {
         display: true,
       },
-      datalabels: {
-        display: true,
-        color: 'white',
-        render: 'label',
-      },
+      // datalabels: {
+      //   display: true,
+      //   color: 'white',
+      //   render: 'label',
+      // },
       labels: {
         fontSize: 11,
         fontColor: '#fff',
         position: 'default',
         render: 'label',
+        textShadow: true,
       },
+    },
+    pieceLabel: {
+      mode: 'label',
+      position: 'default',
+      fontSize: '11',
     },
     animation: {
       duration: 0,
@@ -75,7 +81,7 @@ const Chart = ({ options, chartValue }) => {
       height={300}
       options={graphOption}
       aspectRatio={1}
-      // plugins={[ChartDataLabels]}
+      plugins={[labels]}
     />
   );
 };
@@ -321,7 +327,7 @@ const FeedBack = ({
           </FeedBackBox>
         ))}
       </FeedBackList>
-      <Chart options={options} chartValue={chartValue} />
+      <Chart1 options={options} chartValue={chartValue} />
     </FeedBackContainer>
   );
 };
