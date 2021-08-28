@@ -14,6 +14,15 @@ const Header = () => {
           />
         </ProfileIcon>
       </Link>
+      <Link to="/">
+        <ProfileIcon>
+          <img
+            src={process.env.PUBLIC_URL + '/design/home.png'}
+            alt="home icon"
+            style={{ height: '27px', width: '27px' }}
+          />
+        </ProfileIcon>
+      </Link>
     </Container>
   );
 };

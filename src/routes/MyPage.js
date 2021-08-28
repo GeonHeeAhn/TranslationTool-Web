@@ -57,7 +57,7 @@ const MyPageMenu = ({ match, setMyName, myName }) => {
           onChange={(e) => inputOnChange(e)}
           value={myName}
         />
-        <SearchButton onClick={searchOnClick}>
+        <SearchButton type="submit" onClick={searchOnClick}>
           <img
             src={process.env.PUBLIC_URL + '/design/search.png'}
             alt="search icon"

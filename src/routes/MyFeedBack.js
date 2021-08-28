@@ -13,12 +13,73 @@ import {
 } from 'routes/Translate.js';
 import { dbService } from 'fbase.js';
 import dummyData from 'dummyData.js';
+import { wrapper } from 'text-wrapper';
+
+const Chart = ({ options, chartValue }) => {
+  let rankColor = [
+    '#283A61',
+    '#A3B8E6',
+    '#5B86E0',
+    '#454E61',
+    '#4767AD',
+    '#A8D0E6',
+    '#2A4E61',
+    '#4A8AAD',
+    '#475861',
+  ];
+  let optionsArray = [];
+  optionsArray = options.map((el) => el.label);
+  const data = {
+    labels: optionsArray,
+    datasets: [
+      {
+        backgroundColor: rankColor,
+        borderColor: rankColor,
+        borderWidth: 1,
+        hoverBackgroundColor: rankColor,
+        hoverBorderColor: rankColor,
+        data: chartValue,
+      },
+    ],
+  };
+
+  const graphOption = {
+    legend: {
+      display: false,
+    },
+    parsing: {
+      key: 'data',
+    },
+    pieceLabel: {
+      mode: 'label',
+      position: 'default',
+      fontSize: '11',
+    },
+    maintainAspectRatio: false,
+    responsive: false,
+  };
+
+  return (
+    <StyledChart
+      data={data}
+      width={300}
+      height={300}
+      options={graphOption}
+      aspectRatio={1}
+    />
+  );
+};
 
 const MyFeedBack = ({ match, myName, history }) => {
   const [myScript, setMyScript] = useState('loading');
   const [myFeedBack, setMyFeedBack] = useState([]);
   const [originalScript, setOriginalScript] = useState();
   const [feedBackList, setFeedBackList] = useState([]);
+  const [wrappedOriginalScript, setWrappedOriginalScript] = useState('loading');
+  const [wrappedTranslatedScript, setWrappedTranslatedScript] =
+    useState('loading');
+  const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [options, setOptions] = useState([]);
   // const translatedTask = myTask.find((el) => el.scriptID === match.params.id);
   //   const getYourFeedBack = async () => {
   //     const script = await dbService.collection('studentTest').get();
@@ -46,7 +107,6 @@ const MyFeedBack = ({ match, myName, history }) => {
     const Arr = arr.filter((el) => el.script_ID === match.params.id);
     const fb = Arr.find((el) => el.student_ID === myName);
     setMyFeedBack(fb);
-    console.log(fb);
     if (fb === undefined) {
       window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
       history.goBack();
@@ -57,9 +117,11 @@ const MyFeedBack = ({ match, myName, history }) => {
     if (!myFeedBack) {
       return 'loading';
     } else {
-      console.log(myFeedBack);
       setFeedBackList(myFeedBack.feedBack);
       console.log(feedBackList);
+      let arr = feedBackList.map((a) => a.feedBack);
+      const set = new Set(arr);
+      setOptions([...set]);
     }
   };
 
@@ -74,39 +136,82 @@ const MyFeedBack = ({ match, myName, history }) => {
     setMyScript(myTask.translate_txt);
   };
 
+  const isMyScriptEmpty = () => {
+    if (!myScript) {
+      return 'loading';
+    } else {
+      setWrappedTranslatedScript(
+        wrapper(myScript, {
+          wrapOn: 38,
+          continuationIndent: '\n',
+        })
+      );
+    }
+  };
+
   const findScript = () => {
     setOriginalScript(
       dummyData.student_data.find((el) => el.id === match.params.id).script
     );
   };
 
-  // const isMyScriptEmpty = () => {
-  //   if (studentScript.length === 0) {
-  //     return 'loading';
-  //   } else {
-  //     return studentScript[num].translate_txt;
-  //   }
-  // };
+  const isOriginalScriptEmpty = () => {
+    if (!originalScript) {
+      return 'loading';
+    } else {
+      setWrappedOriginalScript(
+        wrapper(originalScript, {
+          wrapOn: 38,
+          continuationIndent: '\n',
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     getMyScript();
     getMyFeedBack();
-    isFeedBackEmpty();
     findScript();
   }, []);
+
+  useEffect(() => {
+    isMyScriptEmpty();
+  }, [myScript]);
 
   useEffect(() => {
     isFeedBackEmpty();
   }, [myFeedBack]);
 
+  useEffect(() => {
+    isOriginalScriptEmpty();
+  }, [originalScript]);
+
   return (
     <StyledContainer>
       <Box>
         <TextContainer>
-          <TextField>{originalScript}</TextField>
-          <TextField>{myScript}</TextField>
+          <TextField>
+            {wrappedOriginalScript.split('\n').map((line) => {
+              return (
+                <span>
+                  {line}
+                  <br />
+                </span>
+              );
+            })}
+          </TextField>
+          <TextField>
+            {wrappedTranslatedScript.split('\n').map((line) => {
+              return (
+                <span>
+                  {line}
+                  <br />
+                </span>
+              );
+            })}
+          </TextField>
         </TextContainer>
-        <FeedBackContainer>
+        <FeedBackContainer style={{ marginTop: '15px' }}>
           <FeedBackList>
             {feedBackList &&
               feedBackList.map((el) => (
@@ -121,6 +226,7 @@ const MyFeedBack = ({ match, myName, history }) => {
                 </FeedBackBox>
               ))}
           </FeedBackList>
+          <Chart options={options} chartValue={chartValue} />
         </FeedBackContainer>
       </Box>
     </StyledContainer>

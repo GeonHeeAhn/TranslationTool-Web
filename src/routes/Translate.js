@@ -8,7 +8,6 @@ import { Container, IdInput, StyledButton } from 'routes/Student.js';
 import { Doughnut } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import labels from 'chartjs-plugin-labels';
-// import { Doughnut } from 'chart.js';
 
 const Chart1 = ({ options, chartValue }) => {
   let rankColor = [
