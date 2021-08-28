@@ -27,10 +27,8 @@ const Chart = ({ options, chartValue }) => {
     '#4A8AAD',
     '#475861',
   ];
-  let optionsArray = [];
-  optionsArray = options.map((el) => el.label);
   const data = {
-    labels: optionsArray,
+    labels: options,
     datasets: [
       {
         backgroundColor: rankColor,
@@ -78,7 +76,7 @@ const MyFeedBack = ({ match, myName, history }) => {
   const [wrappedOriginalScript, setWrappedOriginalScript] = useState('loading');
   const [wrappedTranslatedScript, setWrappedTranslatedScript] =
     useState('loading');
-  const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [chartValue, setChartValue] = useState([]);
   const [options, setOptions] = useState([]);
   // const translatedTask = myTask.find((el) => el.scriptID === match.params.id);
   //   const getYourFeedBack = async () => {
@@ -118,10 +116,29 @@ const MyFeedBack = ({ match, myName, history }) => {
       return 'loading';
     } else {
       setFeedBackList(myFeedBack.feedBack);
-      console.log(feedBackList);
-      let arr = feedBackList.map((a) => a.feedBack);
-      const set = new Set(arr);
-      setOptions([...set]);
+      if (myFeedBack.feedBack) {
+        let arr = myFeedBack.feedBack.map((a) => a.feedBack);
+        const set = arr.filter((element, index) => {
+          return arr.indexOf(element) === index;
+        });
+        setOptions(set);
+        let Array = [];
+        for (let i = 0; i < set.length; i++) {
+          Array[i] = 0;
+        }
+        console.log(Array);
+        // setChartValue([...Array]);
+        for (let i = 0; i < arr.length; i++) {
+          for (let j = 0; j < set.length; j++) {
+            if (arr[i] === set[j]) {
+              Array[j]++;
+              break;
+            }
+          }
+        }
+        console.log(Array);
+        setChartValue(Array);
+      }
     }
   };
 
@@ -216,7 +233,6 @@ const MyFeedBack = ({ match, myName, history }) => {
             {feedBackList &&
               feedBackList.map((el) => (
                 <FeedBackBox key={el.id}>
-                  {console.log(el)}
                   <div>
                     {el.id} . {el.feedBack} : {el.comment}
                   </div>
