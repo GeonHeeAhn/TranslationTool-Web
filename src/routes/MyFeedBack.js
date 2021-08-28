@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Doughnut } from 'react-chartjs-2';
 import {
   StyledChart,
   StyledContainer,
@@ -9,6 +8,7 @@ import {
   TextField,
   FeedBackList,
   FeedBackBox,
+  FinalComment,
   Box,
 } from 'routes/Translate.js';
 import { dbService } from 'fbase.js';
@@ -78,6 +78,7 @@ const MyFeedBack = ({ match, myName, history }) => {
     useState('loading');
   const [chartValue, setChartValue] = useState([]);
   const [options, setOptions] = useState([]);
+  const [critique, setCritique] = useState('loading');
   // const translatedTask = myTask.find((el) => el.scriptID === match.params.id);
   //   const getYourFeedBack = async () => {
   //     const script = await dbService.collection('studentTest').get();
@@ -115,6 +116,7 @@ const MyFeedBack = ({ match, myName, history }) => {
     if (!myFeedBack) {
       return 'loading';
     } else {
+      setCritique(myFeedBack.general_critique);
       setFeedBackList(myFeedBack.feedBack);
       if (myFeedBack.feedBack) {
         let arr = myFeedBack.feedBack.map((a) => a.feedBack);
@@ -126,8 +128,6 @@ const MyFeedBack = ({ match, myName, history }) => {
         for (let i = 0; i < set.length; i++) {
           Array[i] = 0;
         }
-        console.log(Array);
-        // setChartValue([...Array]);
         for (let i = 0; i < arr.length; i++) {
           for (let j = 0; j < set.length; j++) {
             if (arr[i] === set[j]) {
@@ -136,7 +136,6 @@ const MyFeedBack = ({ match, myName, history }) => {
             }
           }
         }
-        console.log(Array);
         setChartValue(Array);
       }
     }
@@ -197,7 +196,7 @@ const MyFeedBack = ({ match, myName, history }) => {
 
   useEffect(() => {
     isFeedBackEmpty();
-  }, [myFeedBack]);
+  }, [myFeedBack, critique]);
 
   useEffect(() => {
     isOriginalScriptEmpty();
@@ -244,9 +243,28 @@ const MyFeedBack = ({ match, myName, history }) => {
           </FeedBackList>
           <Chart options={options} chartValue={chartValue} />
         </FeedBackContainer>
+        <Label>총평</Label>
+        <CritiqueContainer>{critique}</CritiqueContainer>
       </Box>
     </StyledContainer>
   );
 };
 
 export default MyFeedBack;
+
+const Label = styled.div`
+  width: 100%;
+  line-height: 40px;
+  margin-top: 15px;
+  margin-left: 10px;
+`;
+
+const CritiqueContainer = styled.div`
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 25px;
+  width: 98%;
+  padding: 15px;
+  min-height: 80px;
+  background-color: #f6f6f6;
+`;
