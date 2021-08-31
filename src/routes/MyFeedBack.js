@@ -8,7 +8,7 @@ import {
   TextField,
   FeedBackList,
   FeedBackBox,
-  FinalComment,
+  ChangeButton,
   Box,
 } from 'routes/Translate.js';
 import { dbService } from 'fbase.js';
@@ -79,6 +79,7 @@ const MyFeedBack = ({ match, myName, history }) => {
   const [chartValue, setChartValue] = useState([]);
   const [options, setOptions] = useState([]);
   const [critique, setCritique] = useState('loading');
+  const [indexNum, setIndexNum] = useState(0);
   // const translatedTask = myTask.find((el) => el.scriptID === match.params.id);
   //   const getYourFeedBack = async () => {
   //     const script = await dbService.collection('studentTest').get();
@@ -104,8 +105,10 @@ const MyFeedBack = ({ match, myName, history }) => {
       arr.push(document.data());
     }
     const Arr = arr.filter((el) => el.script_ID === match.params.id);
-    const fb = Arr.find((el) => el.student_ID === myName);
+    const fb = Arr.filter((el) => el.student_ID === myName);
+    console.log(fb);
     setMyFeedBack(fb);
+    console.log(myFeedBack);
     if (fb === undefined) {
       window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
       history.goBack();
@@ -113,13 +116,13 @@ const MyFeedBack = ({ match, myName, history }) => {
   };
 
   const isFeedBackEmpty = () => {
-    if (!myFeedBack) {
+    if (myFeedBack.length === 0) {
       return 'loading';
     } else {
-      setCritique(myFeedBack.general_critique);
-      setFeedBackList(myFeedBack.feedBack);
-      if (myFeedBack.feedBack) {
-        let arr = myFeedBack.feedBack.map((a) => a.feedBack);
+      setCritique(myFeedBack[indexNum].general_critique);
+      setFeedBackList(myFeedBack[indexNum].feedBack);
+      if (myFeedBack[indexNum].feedBack) {
+        let arr = myFeedBack[indexNum].feedBack.map((a) => a.feedBack);
         const set = arr.filter((element, index) => {
           return arr.indexOf(element) === index;
         });
@@ -196,16 +199,35 @@ const MyFeedBack = ({ match, myName, history }) => {
 
   useEffect(() => {
     isFeedBackEmpty();
-  }, [myFeedBack, critique]);
+  }, [myFeedBack, critique, indexNum]);
 
   useEffect(() => {
     isOriginalScriptEmpty();
   }, [originalScript]);
 
+  const plusId = () => {
+    if (indexNum === myFeedBack.length - 1) {
+      alert('더 이상 뒤로 갈 수 없습니다.');
+    } else {
+      setIndexNum(indexNum + 1);
+      console.log(indexNum);
+    }
+  };
+
+  const minusId = () => {
+    if (indexNum === 0) {
+      alert('더 이상 앞으로 갈 수 없습니다.');
+    } else {
+      setIndexNum(indexNum - 1);
+      console.log(indexNum);
+    }
+  };
+
   return (
     <StyledContainer>
       <Box>
         <TextContainer>
+          <ChangeButton onClick={plusId}>-</ChangeButton>
           <TextField>
             {wrappedOriginalScript.split('\n').map((line) => {
               return (
@@ -226,6 +248,7 @@ const MyFeedBack = ({ match, myName, history }) => {
               );
             })}
           </TextField>
+          <ChangeButton onClick={minusId}>+</ChangeButton>
         </TextContainer>
         <FeedBackContainer style={{ marginTop: '15px' }}>
           <FeedBackList>

@@ -760,4 +760,5 @@ export {
   FeedBackBox,
   Box,
   FinalComment,
+  ChangeButton,
 };
