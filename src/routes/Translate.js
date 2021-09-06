@@ -100,9 +100,10 @@ const BottomContainer = ({
   };
 
   const onSubmit = async () => {
-    await dbService.collection('professor').add({
+    await dbService.collection('professorTest').add({
       // student_Name: studentScript[0].studentID,
-      student_ID: studentScript[0].studentID,
+      student_name: studentScript[0].studentID,
+      student_ID: studentScript[0].userID,
       script_ID: studentScript[0].scriptID,
       professor_name: profId,
       professor_ID: authService.currentUser.uid,
@@ -373,7 +374,7 @@ function Translate({ match, history }) {
   const nextId = useRef(0);
   const FBId = useRef(1);
   const getScripts = async () => {
-    const dbScript = await dbService.collection('student').get();
+    const dbScript = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push({ ...document.data(), id: document.id });

@@ -11,9 +11,10 @@ import {
   ChangeButton,
   Box,
 } from 'routes/Translate.js';
-import { dbService } from 'fbase.js';
+import { dbService, authService } from 'fbase.js';
 import dummyData from 'dummyData.js';
 import { wrapper } from 'text-wrapper';
+import { SpaceContext } from 'antd/lib/space';
 
 const Chart = ({ options, chartValue }) => {
   let rankColor = [
@@ -68,9 +69,8 @@ const Chart = ({ options, chartValue }) => {
   );
 };
 
-const MyFeedBack = ({ match, myName, history }) => {
+const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
   const [myScript, setMyScript] = useState('loading');
-  const [myFeedBack, setMyFeedBack] = useState([]);
   const [originalScript, setOriginalScript] = useState();
   const [feedBackList, setFeedBackList] = useState([]);
   const [wrappedOriginalScript, setWrappedOriginalScript] = useState('loading');
@@ -80,49 +80,49 @@ const MyFeedBack = ({ match, myName, history }) => {
   const [options, setOptions] = useState([]);
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
-  // const translatedTask = myTask.find((el) => el.scriptID === match.params.id);
-  //   const getYourFeedBack = async () => {
-  //     const script = await dbService.collection('studentTest').get();
-  //     const arr = [];
-  //     for (const document of script.docs) {
-  //       arr.push(document.data());
-  //     }
-  //     let Arr = [];
-  //     Arr = arr.filter((el) => el.student_ID === authService.currentUser.uid);
-  //     if (Arr.length === 0) {
-  //       Arr.push({
-  //         scriptID: '작성한 과제가 없습니다.',
-  //       });
-  //     }
-  //     console.log(Arr);
-  //     setMyTask(Arr);
-  //   };
-
-  const getMyFeedBack = async () => {
-    const arr = [];
-    const dbScript = await dbService.collection('professor').get();
-    for (const document of dbScript.docs) {
-      arr.push(document.data());
-    }
-    const Arr = arr.filter((el) => el.script_ID === match.params.id);
-    const fb = Arr.filter((el) => el.student_ID === myName);
-    console.log(fb);
-    setMyFeedBack(fb);
-    console.log(myFeedBack);
-    if (fb === undefined) {
+  const [translatedTask, setTranslateTask] = useState([]);
+  let translated = [];
+  const isMyTaskEmpty = () => {
+    translated = myTask.filter((el) => el.script_ID === match.params.id);
+    setTranslateTask(translated);
+    console.log('abc', translated);
+    console.log('length', translated.length);
+    console.log('myTask', myTask);
+    console.log(match.params.id);
+    if (translated === undefined) {
       window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
       history.goBack();
     }
   };
 
+  // const getMyFeedBack = async () => {
+  //   const arr = [];
+  //   const dbScript = await dbService.collection('professor').get();
+  //   for (const document of dbScript.docs) {
+  //     arr.push(document.data());
+  //   }
+  //   const Arr = arr.filter((el) => el.script_ID === match.params.id);
+  //   const fb = Arr.filter((el) => el.student_ID === myName);
+  //   console.log(fb);
+  //   setMyFeedBack(fb);
+  //   console.log(myFeedBack);
+  //   if (fb === undefined) {
+  //     window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
+  //     history.goBack();
+  //   }
+  // };
+
   const isFeedBackEmpty = () => {
-    if (myFeedBack.length === 0) {
+    if (translatedTask.length === 0) {
       return 'loading';
     } else {
-      setCritique(myFeedBack[indexNum].general_critique);
-      setFeedBackList(myFeedBack[indexNum].feedBack);
-      if (myFeedBack[indexNum].feedBack) {
-        let arr = myFeedBack[indexNum].feedBack.map((a) => a.feedBack);
+      // setCritique(myFeedBack[indexNum].general_critique);
+      // setFeedBackList(myFeedBack[indexNum].feedBack);
+      console.log('critique', translatedTask[indexNum].general_critique);
+      setCritique(translatedTask[indexNum].general_critique);
+      setFeedBackList(translatedTask[indexNum].feedBack);
+      if (translatedTask[indexNum].feedBack) {
+        let arr = translatedTask[indexNum].feedBack.map((a) => a.feedBack);
         const set = arr.filter((element, index) => {
           return arr.indexOf(element) === index;
         });
@@ -144,15 +144,25 @@ const MyFeedBack = ({ match, myName, history }) => {
     }
   };
 
-  const getMyScript = async () => {
-    const dbScript = await dbService.collection('student').get();
-    const arr = [];
-    for (const document of dbScript.docs) {
-      arr.push(document.data());
-    }
-    const Arr = arr.filter((el) => el.scriptID === match.params.id);
-    const myTask = Arr.find((el) => el.studentID === myName);
-    setMyScript(myTask.translate_txt);
+  // const getMyScript = async () => {
+  //   const dbScript = await dbService.collection('studentTest').get();
+  //   const arr = [];
+  //   for (const document of dbScript.docs) {
+  //     arr.push(document.data());
+  //   }
+  //   const Arr = arr.filter((el) => el.scriptID === match.params.id);
+  //   const myScript = Arr.find(
+  //     (el) => el.student_ID === authService.currentUser.uid
+  //   );
+  //   console.log('Arr', Arr);
+  //   console.log('myScript', myScript);
+  //   setMyScript(myScript.translate_txt);
+  // };
+  const getMyScript = () => {
+    const scriptlist = myScriptList.find(
+      (el) => el.scriptID === match.params.id
+    );
+    setMyScript(scriptlist.translate_txt);
   };
 
   const isMyScriptEmpty = () => {
@@ -189,7 +199,9 @@ const MyFeedBack = ({ match, myName, history }) => {
 
   useEffect(() => {
     getMyScript();
-    getMyFeedBack();
+    // getMyTask();
+    // getMyFeedBack();
+    isMyTaskEmpty();
     findScript();
   }, []);
 
@@ -199,14 +211,14 @@ const MyFeedBack = ({ match, myName, history }) => {
 
   useEffect(() => {
     isFeedBackEmpty();
-  }, [myFeedBack, critique, indexNum]);
+  }, [critique, indexNum, translatedTask]);
 
   useEffect(() => {
     isOriginalScriptEmpty();
   }, [originalScript]);
 
   const plusId = () => {
-    if (indexNum === myFeedBack.length - 1) {
+    if (indexNum === translatedTask.length - 1) {
       alert('더 이상 뒤로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum + 1);
@@ -227,7 +239,7 @@ const MyFeedBack = ({ match, myName, history }) => {
     <StyledContainer>
       <Box>
         <TextContainer>
-          <ChangeButton onClick={plusId}>-</ChangeButton>
+          <ChangeButton onClick={minusId}>-</ChangeButton>
           <TextField>
             {wrappedOriginalScript.split('\n').map((line) => {
               return (
@@ -248,7 +260,7 @@ const MyFeedBack = ({ match, myName, history }) => {
               );
             })}
           </TextField>
-          <ChangeButton onClick={minusId}>+</ChangeButton>
+          <ChangeButton onClick={plusId}>+</ChangeButton>
         </TextContainer>
         <FeedBackContainer style={{ marginTop: '15px' }}>
           <FeedBackList>
@@ -268,6 +280,7 @@ const MyFeedBack = ({ match, myName, history }) => {
         </FeedBackContainer>
         <Label>총평</Label>
         <CritiqueContainer>{critique}</CritiqueContainer>
+        <SpaceContainer />
       </Box>
     </StyledContainer>
   );
@@ -290,4 +303,8 @@ const CritiqueContainer = styled.div`
   padding: 15px;
   min-height: 80px;
   background-color: #f6f6f6;
+`;
+
+const SpaceContainer = styled.div`
+  height: 200px;
 `;

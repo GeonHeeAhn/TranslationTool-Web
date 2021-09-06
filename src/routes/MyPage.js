@@ -6,24 +6,36 @@ import { dbService, authService } from 'fbase.js';
 import { Route, Link } from 'react-router-dom';
 import dummyData from '../dummyData.js';
 
-const MyPageMenu = ({ match, setMyName, myName }) => {
-  // const [myTask, setMyTask] = useState();
-  // const getTaskList = async () => {
-  //   const TaskList = await dbService.collection('professor').get();
-  //   const arr = [];
-  //   for (const document of TaskList.docs) {
-  //     arr.push(document.data());
-  //   }
-  //   let Arr = [];
-  //   Arr = arr.filter((el) => el.student_ID === authService.currentUser.uid);
-  //   if (Arr.length === 0) {
-  //     Arr.push({
-  //       scriptID: '작성한 과제가 없습니다.',
-  //     });
-  //   }
-  //   console.log(Arr);
-  //   setMyTask(Arr);
-  // };
+const MyPageMenu = ({
+  match,
+  setMyName,
+  myName,
+  setMyTask,
+  setMyScriptList,
+}) => {
+  const getTaskList = async () => {
+    const TaskList = await dbService.collection('professorTest').get();
+    const arr = [];
+    for (const document of TaskList.docs) {
+      arr.push(document.data());
+    }
+    let Arr = [];
+    Arr = arr.filter((el) => el.student_ID === authService.currentUser.uid);
+    console.log(Arr);
+    setMyTask(Arr);
+  };
+
+  const getStudentScriptList = async () => {
+    const TaskList = await dbService.collection('studentTest').get();
+    const arr = [];
+    for (const document of TaskList.docs) {
+      arr.push(document.data());
+    }
+    let Arr = [];
+    Arr = arr.filter((el) => el.userID === authService.currentUser.uid);
+    console.log(Arr);
+    setMyScriptList(Arr);
+  };
 
   // const isMyTaskEmpty = () => {
   //   if (myTask === undefined) {
@@ -36,10 +48,11 @@ const MyPageMenu = ({ match, setMyName, myName }) => {
   //     ));
   //   }
   // };
-  // useEffect(() => {
-  //   getTaskList();
-  //   isMyTaskEmpty();
-  // }, []);
+  useEffect(() => {
+    getTaskList();
+    // isMyTaskEmpty();
+    getStudentScriptList();
+  }, []);
 
   const SearchBar = () => {
     const inputOnChange = (e) => {
@@ -70,7 +83,7 @@ const MyPageMenu = ({ match, setMyName, myName }) => {
 
   return (
     <Page>
-      {SearchBar()}
+      {/* {SearchBar()} */}
       <StyledContainer>
         {dummyData.student_data.map((item) => (
           <Link to={`${match.url}/${item.id}`}>
@@ -84,16 +97,33 @@ const MyPageMenu = ({ match, setMyName, myName }) => {
 
 const MyPage = ({ match }) => {
   const [myName, setMyName] = useState();
+  const [myTask, setMyTask] = useState();
+  const [myScriptList, setMyScriptList] = useState();
   return (
     <>
       <Route
         exact
         path={match.path}
-        render={(props) => MyPageMenu({ match, setMyName, myName })}
+        render={(props) => (
+          <MyPageMenu
+            {...props}
+            setMyName={setMyName}
+            myName={myName}
+            setMyTask={setMyTask}
+            setMyScriptList={setMyScriptList}
+          />
+        )}
       />
       <Route
         path={`${match.path}/:id`}
-        render={(props) => <MyFeedBack {...props} myName={myName} />}
+        render={(props) => (
+          <MyFeedBack
+            {...props}
+            // myName={myName}
+            myTask={myTask}
+            myScriptList={myScriptList}
+          />
+        )}
       />
     </>
   );
