@@ -33,8 +33,8 @@ const Student = ({ match, history }) => {
         // userID: userObj.uid,
       };
       setData([...data, datas]);
-      await dbService.collection('student').add({
-        // await dbService.collection('studentTest').add({
+      // await dbService.collection('student').add({
+      await dbService.collection('studentTest').add({
         studentID: id,
         scriptID: studentData.id,
         translate_txt: transText,

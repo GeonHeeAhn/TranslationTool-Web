@@ -12,9 +12,29 @@ const MyPageMenu = ({
   myName,
   setMyTask,
   setMyScriptList,
+  setIsStudent,
+  isStudent,
 }) => {
+  const studentUID = [
+    'KPvOLs0dIBVSmv9dY2GFRI32Yzz1',
+    'ljN4ZcEo22RyXOhJcFv2X6VYUBk2',
+    'ywCd3Xquo0cuJDQqcHlXgaQ0klo2',
+    'i9q6lEDhBUeYcNBvfZkk46piDEt1',
+    'Ni2piOEen4d8q7C5bSY9PpVDJLg2',
+    'nXy6fEzaeTe0lx3oJueYH61Kyn73',
+    'icbhfUAQrdhDrO322jBT0gMbfCJ3',
+    'hrY18LKqCWMiefRTxkuQkDzvkeJ2',
+  ];
+  const isStudOrProf = () => {
+    if (studentUID.includes(authService.currentUser.uid)) {
+      setIsStudent(true);
+    } else {
+      setIsStudent(false);
+    }
+  };
+
   const getTaskList = async () => {
-    const TaskList = await dbService.collection('professorTest').get();
+    const TaskList = await dbService.collection('professor').get();
     const arr = [];
     for (const document of TaskList.docs) {
       arr.push(document.data());
@@ -26,7 +46,7 @@ const MyPageMenu = ({
   };
 
   const getStudentScriptList = async () => {
-    const TaskList = await dbService.collection('studentTest').get();
+    const TaskList = await dbService.collection('student').get();
     const arr = [];
     for (const document of TaskList.docs) {
       arr.push(document.data());
@@ -37,20 +57,9 @@ const MyPageMenu = ({
     setMyScriptList(Arr);
   };
 
-  // const isMyTaskEmpty = () => {
-  //   if (myTask === undefined) {
-  //     return 'loading';
-  //   } else {
-  //     return myTask.map((item) => (
-  //       <Link to={`${match.url}/${item.script_ID}`}>
-  //         <Button>{item.script_ID}</Button>
-  //       </Link>
-  //     ));
-  //   }
-  // };
   useEffect(() => {
+    isStudOrProf();
     getTaskList();
-    // isMyTaskEmpty();
     getStudentScriptList();
   }, []);
 
@@ -82,16 +91,30 @@ const MyPageMenu = ({
   };
 
   return (
-    <Page>
-      {/* {SearchBar()} */}
-      <StyledContainer>
-        {dummyData.student_data.map((item) => (
-          <Link to={`${match.url}/${item.id}`}>
-            <StyledButton>{item.label}</StyledButton>
-          </Link>
-        ))}
-      </StyledContainer>
-    </Page>
+    <>
+      {isStudent ? (
+        <Page>
+          <StyledContainer>
+            {dummyData.student_data.map((item) => (
+              <Link to={`${match.url}/${item.id}`}>
+                <StyledButton>{item.label}</StyledButton>
+              </Link>
+            ))}
+          </StyledContainer>
+        </Page>
+      ) : (
+        <Page>
+          {SearchBar()}
+          <StyledContainer>
+            {dummyData.student_data.map((item) => (
+              <Link to={`${match.url}/${item.id}`}>
+                <StyledButton>{item.label}</StyledButton>
+              </Link>
+            ))}
+          </StyledContainer>
+        </Page>
+      )}
+    </>
   );
 };
 
@@ -99,6 +122,8 @@ const MyPage = ({ match }) => {
   const [myName, setMyName] = useState();
   const [myTask, setMyTask] = useState();
   const [myScriptList, setMyScriptList] = useState();
+  const [isStudent, setIsStudent] = useState();
+
   return (
     <>
       <Route
@@ -109,6 +134,8 @@ const MyPage = ({ match }) => {
             {...props}
             setMyName={setMyName}
             myName={myName}
+            isStudent={isStudent}
+            setIsStudent={setIsStudent}
             setMyTask={setMyTask}
             setMyScriptList={setMyScriptList}
           />
@@ -119,7 +146,8 @@ const MyPage = ({ match }) => {
         render={(props) => (
           <MyFeedBack
             {...props}
-            // myName={myName}
+            myName={myName}
+            isStudent={isStudent}
             myTask={myTask}
             myScriptList={myScriptList}
           />

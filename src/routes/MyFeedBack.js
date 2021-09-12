@@ -69,7 +69,7 @@ const Chart = ({ options, chartValue }) => {
   );
 };
 
-const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
+const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [myScript, setMyScript] = useState('loading');
   const [originalScript, setOriginalScript] = useState();
   const [feedBackList, setFeedBackList] = useState([]);
@@ -82,6 +82,7 @@ const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
   const [indexNum, setIndexNum] = useState(0);
   const [translatedTask, setTranslateTask] = useState([]);
   let translated = [];
+  let scriptList = [];
   const isMyTaskEmpty = () => {
     translated = myTask.filter((el) => el.script_ID === match.params.id);
     setTranslateTask(translated);
@@ -90,8 +91,43 @@ const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
     console.log('myTask', myTask);
     console.log(match.params.id);
     if (translated === undefined) {
-      window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
-      history.goBack();
+      sortingFunction();
+    }
+  };
+
+  const sortingFunction = () => {
+    if (translated.length === 0) {
+      console.log('un tr', translated);
+      if (scriptList === undefined) {
+        console.log('un sc', scriptList);
+        window.alert('해당 과제를 제출하지 않았습니다. ');
+        history.goBack();
+      } else {
+        console.log(scriptList);
+        const dummy = { feedBack: [], general_critique: '' };
+        setTranslateTask(dummy);
+      }
+    }
+  };
+  const getMyScript = () => {
+    scriptList = myScriptList.find((el) => el.scriptID === match.params.id);
+    if (scriptList === undefined) {
+      sortingFunction();
+    } else {
+      setMyScript(scriptList.translate_txt);
+    }
+  };
+
+  const isMyScriptEmpty = () => {
+    if (!myScript) {
+      return 'loading';
+    } else {
+      setWrappedTranslatedScript(
+        wrapper(myScript, {
+          wrapOn: 38,
+          continuationIndent: '\n',
+        })
+      );
     }
   };
 
@@ -158,25 +194,6 @@ const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
   //   console.log('myScript', myScript);
   //   setMyScript(myScript.translate_txt);
   // };
-  const getMyScript = () => {
-    const scriptlist = myScriptList.find(
-      (el) => el.scriptID === match.params.id
-    );
-    setMyScript(scriptlist.translate_txt);
-  };
-
-  const isMyScriptEmpty = () => {
-    if (!myScript) {
-      return 'loading';
-    } else {
-      setWrappedTranslatedScript(
-        wrapper(myScript, {
-          wrapOn: 38,
-          continuationIndent: '\n',
-        })
-      );
-    }
-  };
 
   const findScript = () => {
     setOriginalScript(
@@ -201,6 +218,7 @@ const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
     getMyScript();
     // getMyTask();
     // getMyFeedBack();
+    sortingFunction();
     isMyTaskEmpty();
     findScript();
   }, []);
@@ -286,6 +304,53 @@ const MyFeedBack = ({ match, myName, history, myTask, myScriptList }) => {
   );
 };
 
+const ProfVersion = ({ myName }) => {
+  return (
+    <StyledContainer>
+      <Box>
+        <TextContainer>
+          <ChangeButton>-</ChangeButton>
+          <TextField></TextField>
+          <TextField></TextField>
+          <ChangeButton>+</ChangeButton>
+        </TextContainer>
+        <FeedBackContainer style={{ marginTop: '15px' }}>
+          <FeedBackList></FeedBackList>
+          {/* <Chart /> */}
+        </FeedBackContainer>
+        <Label>총평</Label>
+        <CritiqueContainer></CritiqueContainer>
+        <SpaceContainer />
+      </Box>
+    </StyledContainer>
+  );
+};
+
+const MyFeedBack = ({
+  match,
+  myName,
+  history,
+  myTask,
+  myScriptList,
+  isStudent,
+}) => {
+  return (
+    <>
+      {isStudent ? (
+        <StudentVersion
+          match={match}
+          myName={myName}
+          history={history}
+          myTask={myTask}
+          myScriptList={myScriptList}
+          isStudent={isStudent}
+        />
+      ) : (
+        <ProfVersion myName={myName} />
+      )}
+    </>
+  );
+};
 export default MyFeedBack;
 
 const Label = styled.div`
