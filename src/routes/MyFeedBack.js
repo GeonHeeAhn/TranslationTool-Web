@@ -131,29 +131,10 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     }
   };
 
-  // const getMyFeedBack = async () => {
-  //   const arr = [];
-  //   const dbScript = await dbService.collection('professor').get();
-  //   for (const document of dbScript.docs) {
-  //     arr.push(document.data());
-  //   }
-  //   const Arr = arr.filter((el) => el.script_ID === match.params.id);
-  //   const fb = Arr.filter((el) => el.student_ID === myName);
-  //   console.log(fb);
-  //   setMyFeedBack(fb);
-  //   console.log(myFeedBack);
-  //   if (fb === undefined) {
-  //     window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
-  //     history.goBack();
-  //   }
-  // };
-
   const isFeedBackEmpty = () => {
     if (translatedTask.length === 0) {
       return 'loading';
     } else {
-      // setCritique(myFeedBack[indexNum].general_critique);
-      // setFeedBackList(myFeedBack[indexNum].feedBack);
       console.log('critique', translatedTask[indexNum].general_critique);
       setCritique(translatedTask[indexNum].general_critique);
       setFeedBackList(translatedTask[indexNum].feedBack);
@@ -180,21 +161,6 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     }
   };
 
-  // const getMyScript = async () => {
-  //   const dbScript = await dbService.collection('studentTest').get();
-  //   const arr = [];
-  //   for (const document of dbScript.docs) {
-  //     arr.push(document.data());
-  //   }
-  //   const Arr = arr.filter((el) => el.scriptID === match.params.id);
-  //   const myScript = Arr.find(
-  //     (el) => el.student_ID === authService.currentUser.uid
-  //   );
-  //   console.log('Arr', Arr);
-  //   console.log('myScript', myScript);
-  //   setMyScript(myScript.translate_txt);
-  // };
-
   const findScript = () => {
     setOriginalScript(
       dummyData.student_data.find((el) => el.id === match.params.id).script
@@ -216,8 +182,6 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
 
   useEffect(() => {
     getMyScript();
-    // getMyTask();
-    // getMyFeedBack();
     sortingFunction();
     isMyTaskEmpty();
     findScript();
@@ -304,22 +268,197 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   );
 };
 
-const ProfVersion = ({ myName }) => {
+const ProfVersion = ({ myName, match, history }) => {
+  const [myScript, setMyScript] = useState('loading');
+  const [originalScript, setOriginalScript] = useState();
+  const [feedBackList, setFeedBackList] = useState([]);
+  const [wrappedOriginalScript, setWrappedOriginalScript] = useState('loading');
+  const [wrappedTranslatedScript, setWrappedTranslatedScript] =
+    useState('loading');
+  const [chartValue, setChartValue] = useState([]);
+  const [options, setOptions] = useState([]);
+  const [critique, setCritique] = useState('loading');
+  const [indexNum, setIndexNum] = useState(0);
+  const [professorFeedBack, setProfessorFeedBack] = useState([]);
+
+  const getMyScript = async () => {
+    const dbScript = await dbService.collection('student').get();
+    const arr = [];
+    for (const document of dbScript.docs) {
+      arr.push(document.data());
+    }
+    const Arr = arr.filter((el) => el.scriptID === match.params.id);
+    const myscript = Arr.find((el) => el.studentID === myName);
+    console.log('myScript', myScript);
+    if (myscript) {
+      setMyScript(myscript.translate_txt);
+    }
+  };
+
+  const isMyScriptEmpty = () => {
+    if (!myScript) {
+      return 'loading';
+    } else {
+      setWrappedTranslatedScript(
+        wrapper(myScript, {
+          wrapOn: 38,
+          continuationIndent: '\n',
+        })
+      );
+    }
+  };
+
+  const findScript = () => {
+    setOriginalScript(
+      dummyData.student_data.find((el) => el.id === match.params.id).script
+    );
+  };
+
+  const isOriginalScriptEmpty = () => {
+    if (!originalScript) {
+      return 'loading';
+    } else {
+      setWrappedOriginalScript(
+        wrapper(originalScript, {
+          wrapOn: 38,
+          continuationIndent: '\n',
+        })
+      );
+    }
+  };
+
+  const getMyFeedBack = async () => {
+    const arr = [];
+    const dbScript = await dbService.collection('professor').get();
+    for (const document of dbScript.docs) {
+      arr.push(document.data());
+    }
+    const Arr = arr.filter((el) => el.script_ID === match.params.id);
+    const fb = Arr.filter((el) => el.student_name === myName);
+    console.log(fb);
+    setProfessorFeedBack(fb);
+    const TotalCritique = fb.map((a) => a.general_critique);
+    // const fbList = fb.map((a) => a.feedBack);
+    setCritique(TotalCritique);
+    // setFeedBackList(fbList);
+    if (fb.length === 0) {
+      window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
+      history.goBack();
+    }
+  };
+
+  const isFeedBackEmpty = () => {
+    if (professorFeedBack.length === 0) {
+      return 'loading';
+    } else {
+      setFeedBackList(professorFeedBack[indexNum].feedBack);
+      if (professorFeedBack[indexNum].feedBack) {
+        let fbList = professorFeedBack[indexNum].feedBack.map(
+          (a) => a.feedBack
+        );
+        const set = fbList.filter((element, index) => {
+          return fbList.indexOf(element) === index;
+        });
+        setOptions(set);
+        let Array = [];
+        for (let i = 0; i < set.length; i++) {
+          Array[i] = 0;
+        }
+        for (let i = 0; i < fbList.length; i++) {
+          for (let j = 0; j < set.length; j++) {
+            if (fbList[i] === set[j]) {
+              Array[j]++;
+              break;
+            }
+          }
+        }
+        setChartValue(Array);
+      }
+    }
+  };
+
+  const plusId = () => {
+    if (indexNum === professorFeedBack.length - 1) {
+      alert('더 이상 뒤로 갈 수 없습니다.');
+    } else {
+      setIndexNum(indexNum + 1);
+      console.log(indexNum);
+    }
+  };
+
+  const minusId = () => {
+    if (indexNum === 0) {
+      alert('더 이상 앞으로 갈 수 없습니다.');
+    } else {
+      setIndexNum(indexNum - 1);
+      console.log(indexNum);
+    }
+  };
+
+  useEffect(() => {
+    getMyScript();
+    findScript();
+    isOriginalScriptEmpty();
+    getMyFeedBack();
+  }, []);
+
+  useEffect(() => {
+    isMyScriptEmpty();
+  }, [myScript]);
+
+  useEffect(() => {
+    isFeedBackEmpty();
+  }, [feedBackList, indexNum, professorFeedBack]);
+
+  useEffect(() => {
+    isOriginalScriptEmpty();
+  }, [originalScript]);
+
   return (
     <StyledContainer>
       <Box>
         <TextContainer>
-          <ChangeButton>-</ChangeButton>
-          <TextField></TextField>
-          <TextField></TextField>
-          <ChangeButton>+</ChangeButton>
+          <ChangeButton onClick={minusId}>-</ChangeButton>
+          <TextField>
+            {wrappedOriginalScript.split('\n').map((line) => {
+              return (
+                <span>
+                  {line}
+                  <br />
+                </span>
+              );
+            })}
+          </TextField>
+          <TextField>
+            {wrappedTranslatedScript.split('\n').map((line) => {
+              return (
+                <span>
+                  {line}
+                  <br />
+                </span>
+              );
+            })}
+          </TextField>
+          <ChangeButton onClick={plusId}>+</ChangeButton>
         </TextContainer>
         <FeedBackContainer style={{ marginTop: '15px' }}>
-          <FeedBackList></FeedBackList>
-          {/* <Chart /> */}
+          <FeedBackList>
+            {feedBackList &&
+              feedBackList.map((el) => (
+                <FeedBackBox key={el.id}>
+                  <div>
+                    {el.id} . {el.feedBack} : {el.comment}
+                  </div>
+                  <div>
+                    {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
+                  </div>
+                </FeedBackBox>
+              ))}
+          </FeedBackList>
+          <Chart options={options} chartValue={chartValue} />
         </FeedBackContainer>
         <Label>총평</Label>
-        <CritiqueContainer></CritiqueContainer>
+        <CritiqueContainer>{critique[indexNum]}</CritiqueContainer>
         <SpaceContainer />
       </Box>
     </StyledContainer>
@@ -346,7 +485,7 @@ const MyFeedBack = ({
           isStudent={isStudent}
         />
       ) : (
-        <ProfVersion myName={myName} />
+        <ProfVersion myName={myName} match={match} history={history} />
       )}
     </>
   );
