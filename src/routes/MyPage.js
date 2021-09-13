@@ -34,7 +34,7 @@ const MyPageMenu = ({
   };
 
   const getTaskList = async () => {
-    const TaskList = await dbService.collection('professor').get();
+    const TaskList = await dbService.collection('professorTest').get();
     const arr = [];
     for (const document of TaskList.docs) {
       arr.push(document.data());
@@ -46,7 +46,7 @@ const MyPageMenu = ({
   };
 
   const getStudentScriptList = async () => {
-    const TaskList = await dbService.collection('student').get();
+    const TaskList = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of TaskList.docs) {
       arr.push(document.data());

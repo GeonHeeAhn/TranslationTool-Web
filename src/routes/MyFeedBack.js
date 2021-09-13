@@ -80,35 +80,36 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [options, setOptions] = useState([]);
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
-  const [translatedTask, setTranslateTask] = useState([]);
+  const [translatedTask, setTranslatedTask] = useState([]);
+  const [whichCase, setWhichCase] = useState(0);
   let translated = [];
   let scriptList = [];
+
   const isMyTaskEmpty = () => {
     translated = myTask.filter((el) => el.script_ID === match.params.id);
-    setTranslateTask(translated);
-    console.log('abc', translated);
-    console.log('length', translated.length);
-    console.log('myTask', myTask);
-    console.log(match.params.id);
-    if (translated === undefined) {
+    setTranslatedTask(translated);
+    console.log('translated', translated);
+    console.log('length', translatedTask.length);
+    if (translated.length === 0) {
       sortingFunction();
     }
   };
 
   const sortingFunction = () => {
-    if (translated.length === 0) {
-      console.log('un tr', translated);
-      if (scriptList === undefined) {
-        console.log('un sc', scriptList);
-        window.alert('해당 과제를 제출하지 않았습니다. ');
-        history.goBack();
-      } else {
-        console.log(scriptList);
-        const dummy = { feedBack: [], general_critique: '' };
-        setTranslateTask(dummy);
-      }
+    if (scriptList === undefined) {
+      setWhichCase(2);
+      window.alert('해당 과제를 제출하지 않았습니다. ');
+      console.log('피드백, 과제 x', whichCase);
+      // history.goBack();
+    } else {
+      setWhichCase(1);
+      console.log('과제 ㅇ 피드백x', whichCase);
+      window.alert('과제에 대한 피드백이 존재하지 않습니다. ');
+      const dummy = [{ feedBack: [], general_critique: '' }];
+      setTranslatedTask(dummy);
     }
   };
+
   const getMyScript = () => {
     scriptList = myScriptList.find((el) => el.scriptID === match.params.id);
     if (scriptList === undefined) {
@@ -135,6 +136,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     if (translatedTask.length === 0) {
       return 'loading';
     } else {
+      console.log('크리틱 위에서 콘솔', translatedTask);
       console.log('critique', translatedTask[indexNum].general_critique);
       setCritique(translatedTask[indexNum].general_critique);
       setFeedBackList(translatedTask[indexNum].feedBack);
@@ -182,7 +184,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
 
   useEffect(() => {
     getMyScript();
-    sortingFunction();
+    // sortingFunction();
     isMyTaskEmpty();
     findScript();
   }, []);
@@ -204,7 +206,6 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
       alert('더 이상 뒤로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum + 1);
-      console.log(indexNum);
     }
   };
 
@@ -213,57 +214,74 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
       alert('더 이상 앞으로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum - 1);
-      console.log(indexNum);
     }
   };
 
   return (
     <StyledContainer>
-      <Box>
-        <TextContainer>
-          <ChangeButton onClick={minusId}>-</ChangeButton>
-          <TextField>
-            {wrappedOriginalScript.split('\n').map((line) => {
-              return (
-                <span>
-                  {line}
-                  <br />
-                </span>
-              );
-            })}
-          </TextField>
-          <TextField>
-            {wrappedTranslatedScript.split('\n').map((line) => {
-              return (
-                <span>
-                  {line}
-                  <br />
-                </span>
-              );
-            })}
-          </TextField>
-          <ChangeButton onClick={plusId}>+</ChangeButton>
-        </TextContainer>
-        <FeedBackContainer style={{ marginTop: '15px' }}>
-          <FeedBackList>
-            {feedBackList &&
-              feedBackList.map((el) => (
-                <FeedBackBox key={el.id}>
-                  <div>
-                    {el.id} . {el.feedBack} : {el.comment}
-                  </div>
-                  <div>
-                    {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-                  </div>
-                </FeedBackBox>
-              ))}
-          </FeedBackList>
-          <Chart options={options} chartValue={chartValue} />
-        </FeedBackContainer>
-        <Label>총평</Label>
-        <CritiqueContainer>{critique}</CritiqueContainer>
-        <SpaceContainer />
-      </Box>
+      {(() => {
+        if (whichCase === 0) {
+          return (
+            <Box>
+              <TextContainer>
+                <ChangeButton onClick={minusId}>-</ChangeButton>
+                <TextField>
+                  {wrappedOriginalScript.split('\n').map((line) => {
+                    return (
+                      <span>
+                        {line}
+                        <br />
+                      </span>
+                    );
+                  })}
+                </TextField>
+                <TextField>
+                  {wrappedTranslatedScript.split('\n').map((line) => {
+                    return (
+                      <span>
+                        {line}
+                        <br />
+                      </span>
+                    );
+                  })}
+                </TextField>
+                <ChangeButton onClick={plusId}>+</ChangeButton>
+              </TextContainer>
+              <FeedBackContainer style={{ marginTop: '15px' }}>
+                <FeedBackList>
+                  {feedBackList &&
+                    feedBackList.map((el) => (
+                      <FeedBackBox key={el.id}>
+                        <div>
+                          {el.id} . {el.feedBack} : {el.comment}
+                        </div>
+                        <div>
+                          {el.selectedText.indexNum}번째 줄 :{' '}
+                          {el.selectedText.text}
+                        </div>
+                      </FeedBackBox>
+                    ))}
+                </FeedBackList>
+                <Chart options={options} chartValue={chartValue} />
+              </FeedBackContainer>
+              <Label>총평</Label>
+              <CritiqueContainer>{critique}</CritiqueContainer>
+              <SpaceContainer />
+            </Box>
+          );
+        } else if (whichCase === 1) {
+          return (
+            <Box>
+              <OnlyTextContainer>
+                <OnlyText>{wrappedOriginalScript}</OnlyText>
+                <OnlyText>{wrappedTranslatedScript}</OnlyText>
+              </OnlyTextContainer>
+            </Box>
+          );
+        } else if (whichCase === 2) {
+          return <div>과제를 제출해주세요</div>;
+        }
+      })()}
     </StyledContainer>
   );
 };
@@ -511,4 +529,25 @@ const CritiqueContainer = styled.div`
 
 const SpaceContainer = styled.div`
   height: 200px;
+`;
+
+const OnlyText = styled.div`
+  width: 40%;
+  height: 500px;
+  border-radius: 15px;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f9f9f9;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const OnlyTextContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
 `;
