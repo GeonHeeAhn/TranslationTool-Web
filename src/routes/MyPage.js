@@ -49,7 +49,8 @@ const MyPageMenu = ({
     const TaskList = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of TaskList.docs) {
-      arr.push(document.data());
+      const data = { ...document.data(), docID: document.id };
+      arr.push(data);
     }
     let Arr = [];
     Arr = arr.filter((el) => el.userID === authService.currentUser.uid);

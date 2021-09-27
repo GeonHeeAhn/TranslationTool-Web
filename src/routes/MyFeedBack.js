@@ -82,6 +82,8 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [indexNum, setIndexNum] = useState(0);
   const [translatedTask, setTranslatedTask] = useState([]);
   const [whichCase, setWhichCase] = useState(0);
+  const [changedTask, setChangedTask] = useState(wrappedTranslatedScript);
+  const [DocID, setDocID] = useState();
   let translated = [];
   let scriptList = [];
 
@@ -98,15 +100,16 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const sortingFunction = () => {
     if (scriptList === undefined) {
       setWhichCase(2);
-      window.alert('해당 과제를 제출하지 않았습니다. ');
+      // window.alert('해당 과제를 제출하지 않았습니다. ');
       console.log('피드백, 과제 x', whichCase);
+      window.alert('해당 과제를 제출하지 않았습니다. ');
       // history.goBack();
     } else {
       setWhichCase(1);
       console.log('과제 ㅇ 피드백x', whichCase);
-      window.alert('과제에 대한 피드백이 존재하지 않습니다. ');
       const dummy = [{ feedBack: [], general_critique: '' }];
       setTranslatedTask(dummy);
+      // window.alert('과제에 대한 피드백이 존재하지 않습니다. ');
     }
   };
 
@@ -115,6 +118,8 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     if (scriptList === undefined) {
       sortingFunction();
     } else {
+      setDocID(scriptList.docID);
+      console.log(DocID);
       setMyScript(scriptList.translate_txt);
     }
   };
@@ -136,8 +141,6 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     if (translatedTask.length === 0) {
       return 'loading';
     } else {
-      console.log('크리틱 위에서 콘솔', translatedTask);
-      console.log('critique', translatedTask[indexNum].general_critique);
       setCritique(translatedTask[indexNum].general_critique);
       setFeedBackList(translatedTask[indexNum].feedBack);
       if (translatedTask[indexNum].feedBack) {
@@ -191,6 +194,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
 
   useEffect(() => {
     isMyScriptEmpty();
+    changeValue();
   }, [myScript]);
 
   useEffect(() => {
@@ -214,6 +218,27 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
       alert('더 이상 앞으로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum - 1);
+    }
+  };
+  const changeValue = () => {
+    setChangedTask(myScript);
+  };
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setChangedTask(e.target.value);
+  };
+
+  const taskUpdate = () => {
+    if (!DocID) {
+      window.alert('loading');
+      console.log('doc', scriptList.docID);
+    } else {
+      dbService.collection('studentTest').doc(DocID).update({
+        translate_txt: changedTask,
+      });
+      window.alert('수정완료');
+      console.log('doc', scriptList.docID);
     }
   };
 
@@ -274,8 +299,13 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
             <Box>
               <OnlyTextContainer>
                 <OnlyText>{wrappedOriginalScript}</OnlyText>
-                <OnlyText>{wrappedTranslatedScript}</OnlyText>
+                <TextUpdate value={changedTask} onChange={handleChange}>
+                  {changedTask}
+                </TextUpdate>
               </OnlyTextContainer>
+              <UpdateButton onClick={taskUpdate}>
+                Click here to update your task
+              </UpdateButton>
             </Box>
           );
         } else if (whichCase === 2) {
@@ -543,6 +573,22 @@ const OnlyText = styled.div`
   }
 `;
 
+const TextUpdate = styled.textarea`
+  width: 40%;
+  height: 500px;
+  border-radius: 15px;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #dadada;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  :focus {
+    outline: none;
+  }
+`;
+
 const OnlyTextContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -550,4 +596,19 @@ const OnlyTextContainer = styled.div`
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
+`;
+
+const UpdateButton = styled.button`
+  padding: 15px;
+  border-radius: 17px;
+  border: none;
+  width: 300px;
+  background-color: #f3f3f3;
+  :hover {
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.07);
+    border: none;
+  }
+  a:active {
+    border: none;
+  }
 `;
