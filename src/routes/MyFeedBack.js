@@ -86,6 +86,8 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [DocID, setDocID] = useState();
   let translated = [];
   let scriptList = [];
+  let i = 1;
+  let j = 1;
 
   const isMyTaskEmpty = () => {
     translated = myTask.filter((el) => el.script_ID === match.params.id);
@@ -232,88 +234,99 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const taskUpdate = () => {
     if (!DocID) {
       window.alert('loading');
-      console.log('doc', scriptList.docID);
     } else {
       dbService.collection('studentTest').doc(DocID).update({
         translate_txt: changedTask,
       });
       window.alert('수정완료');
-      console.log('doc', scriptList.docID);
     }
   };
 
-  return (
-    <StyledContainer>
-      {(() => {
-        if (whichCase === 0) {
-          return (
-            <Box>
-              <TextContainer>
-                <ChangeButton onClick={minusId}>-</ChangeButton>
-                <TextField>
-                  {wrappedOriginalScript.split('\n').map((line) => {
-                    return (
+  const changeBody = () => {
+    if (whichCase === 0) {
+      return (
+        <Box>
+          <TextContainer>
+            <ChangeButton onClick={minusId}>-</ChangeButton>
+            <TextField>
+              {wrappedOriginalScript.split('\n').map((line) => {
+                return (
+                  <>
+                    {line !== '' ? (
                       <span>
-                        {line}
+                        {i++} : {line}
                         <br />
                       </span>
-                    );
-                  })}
-                </TextField>
-                <TextField>
-                  {wrappedTranslatedScript.split('\n').map((line) => {
-                    return (
+                    ) : (
                       <span>
-                        {line}
+                        {line} <br />
+                      </span>
+                    )}
+                  </>
+                );
+              })}
+            </TextField>
+            <TextField>
+              {wrappedTranslatedScript.split('\n').map((line) => {
+                return (
+                  <>
+                    {line !== '' ? (
+                      <span>
+                        {j++} : {line}
                         <br />
                       </span>
-                    );
-                  })}
-                </TextField>
-                <ChangeButton onClick={plusId}>+</ChangeButton>
-              </TextContainer>
-              <FeedBackContainer style={{ marginTop: '15px' }}>
-                <FeedBackList>
-                  {feedBackList &&
-                    feedBackList.map((el) => (
-                      <FeedBackBox key={el.id}>
-                        <div>
-                          {el.id} . {el.feedBack} : {el.comment}
-                        </div>
-                        <div>
-                          {el.selectedText.indexNum}번째 줄 :{' '}
-                          {el.selectedText.text}
-                        </div>
-                      </FeedBackBox>
-                    ))}
-                </FeedBackList>
-                <Chart options={options} chartValue={chartValue} />
-              </FeedBackContainer>
-              <Label>총평</Label>
-              <CritiqueContainer>{critique}</CritiqueContainer>
-              <SpaceContainer />
-            </Box>
-          );
-        } else if (whichCase === 1) {
-          return (
-            <Box>
-              <OnlyTextContainer>
-                <OnlyText>{wrappedOriginalScript}</OnlyText>
-                <TextUpdate value={changedTask} onChange={handleChange}>
-                  {changedTask}
-                </TextUpdate>
-              </OnlyTextContainer>
-              <UpdateButton onClick={taskUpdate}>
-                Click here to update your task
-              </UpdateButton>
-            </Box>
-          );
-        } else if (whichCase === 2) {
-          return <div>과제를 제출해주세요</div>;
-        }
-      })()}
-    </StyledContainer>
-  );
+                    ) : (
+                      <span>
+                        {line} <br />
+                      </span>
+                    )}
+                  </>
+                );
+              })}
+            </TextField>
+            <ChangeButton onClick={plusId}>+</ChangeButton>
+          </TextContainer>
+          <FeedBackContainer style={{ marginTop: '15px' }}>
+            <FeedBackList>
+              {feedBackList &&
+                feedBackList.map((el) => (
+                  <FeedBackBox key={el.id}>
+                    <div>
+                      {el.id} . {el.feedBack} : {el.comment}
+                    </div>
+                    <div>
+                      {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
+                    </div>
+                  </FeedBackBox>
+                ))}
+            </FeedBackList>
+            <Chart options={options} chartValue={chartValue} />
+          </FeedBackContainer>
+          <Label>총평</Label>
+          <CritiqueContainer>{critique}</CritiqueContainer>
+          <SpaceContainer />
+        </Box>
+      );
+    } else if (whichCase === 1) {
+      return (
+        <Box>
+          <OnlyTextContainer>
+            <OnlyText>{wrappedOriginalScript}</OnlyText>
+            <TextUpdate value={changedTask} onChange={handleChange}>
+              {changedTask}
+            </TextUpdate>
+          </OnlyTextContainer>
+          <UpdateButton onClick={taskUpdate}>
+            Click here to update your task
+          </UpdateButton>
+        </Box>
+      );
+    } else {
+      return <div>과제를 제출해주세요</div>;
+    }
+  };
+
+  return <StyledContainer>{changeBody()}</StyledContainer>;
 };
 
 const ProfVersion = ({ myName, match, history }) => {
@@ -328,7 +341,8 @@ const ProfVersion = ({ myName, match, history }) => {
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
   const [professorFeedBack, setProfessorFeedBack] = useState([]);
-
+  let i = 1;
+  let j = 1;
   const getMyScript = async () => {
     const dbScript = await dbService.collection('student').get();
     const arr = [];
@@ -470,20 +484,36 @@ const ProfVersion = ({ myName, match, history }) => {
           <TextField>
             {wrappedOriginalScript.split('\n').map((line) => {
               return (
-                <span>
-                  {line}
-                  <br />
-                </span>
+                <>
+                  {line !== '' ? (
+                    <span>
+                      {i++} : {line}
+                      <br />
+                    </span>
+                  ) : (
+                    <span>
+                      {line} <br />
+                    </span>
+                  )}
+                </>
               );
             })}
           </TextField>
           <TextField>
             {wrappedTranslatedScript.split('\n').map((line) => {
               return (
-                <span>
-                  {line}
-                  <br />
-                </span>
+                <>
+                  {line !== '' ? (
+                    <span>
+                      {i++} : {line}
+                      <br />
+                    </span>
+                  ) : (
+                    <span>
+                      {line} <br />
+                    </span>
+                  )}
+                </>
               );
             })}
           </TextField>

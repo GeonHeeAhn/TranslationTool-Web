@@ -150,6 +150,8 @@ const TextBox = ({
   isOriginalScriptEmpty,
   IsStudentScriptEmpty,
 }) => {
+  let i = 1;
+  let j = 1;
   const dragAndSelect = (e) => {
     console.log(studentScript);
     e.preventDefault();
@@ -227,20 +229,36 @@ const TextBox = ({
       <TextField onClick={originalDragAndSelect}>
         {WrappedBefore.split('\n').map((line) => {
           return (
-            <span>
-              {line}
-              <br />
-            </span>
+            <>
+              {line !== '' ? (
+                <span>
+                  {i++} : {line}
+                  <br />
+                </span>
+              ) : (
+                <span>
+                  {line} <br />
+                </span>
+              )}
+            </>
           );
         })}
       </TextField>
       <TextField className="TranslateField" onClick={dragAndSelect}>
         {WrappedAfter.split('\n').map((line) => {
           return (
-            <span>
-              {line}
-              <br />
-            </span>
+            <>
+              {line !== '' ? (
+                <span>
+                  {j++} : {line}
+                  <br />
+                </span>
+              ) : (
+                <span>
+                  {line} <br />
+                </span>
+              )}
+            </>
           );
         })}
       </TextField>
