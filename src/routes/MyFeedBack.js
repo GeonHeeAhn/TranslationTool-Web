@@ -102,13 +102,10 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const sortingFunction = () => {
     if (scriptList === undefined) {
       setWhichCase(2);
-      // window.alert('해당 과제를 제출하지 않았습니다. ');
-      console.log('피드백, 과제 x', whichCase);
       window.alert('해당 과제를 제출하지 않았습니다. ');
       // history.goBack();
     } else {
       setWhichCase(1);
-      console.log('과제 ㅇ 피드백x', whichCase);
       const dummy = [{ feedBack: [], general_critique: '' }];
       setTranslatedTask(dummy);
       // window.alert('과제에 대한 피드백이 존재하지 않습니다. ');
@@ -340,11 +337,12 @@ const ProfVersion = ({ myName, match, history }) => {
   const [options, setOptions] = useState([]);
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
+  const [isMyUID, setIsMyUID] = useState();
   const [professorFeedBack, setProfessorFeedBack] = useState([]);
   let i = 1;
   let j = 1;
   const getMyScript = async () => {
-    const dbScript = await dbService.collection('student').get();
+    const dbScript = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push(document.data());
@@ -391,18 +389,17 @@ const ProfVersion = ({ myName, match, history }) => {
 
   const getMyFeedBack = async () => {
     const arr = [];
-    const dbScript = await dbService.collection('professor').get();
+    const dbScript = await dbService.collection('professorTest').get();
     for (const document of dbScript.docs) {
       arr.push(document.data());
     }
     const Arr = arr.filter((el) => el.script_ID === match.params.id);
     const fb = Arr.filter((el) => el.student_name === myName);
-    console.log(fb);
     setProfessorFeedBack(fb);
+    const professorID = fb.map((a) => a.professor_ID);
+    setIsMyUID(professorID);
     const TotalCritique = fb.map((a) => a.general_critique);
-    // const fbList = fb.map((a) => a.feedBack);
     setCritique(TotalCritique);
-    // setFeedBackList(fbList);
     if (fb.length === 0) {
       window.alert('해당 과제에 대한 피드백이 존재하지 않습니다. ');
       history.goBack();
@@ -444,7 +441,6 @@ const ProfVersion = ({ myName, match, history }) => {
       alert('더 이상 뒤로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum + 1);
-      console.log(indexNum);
     }
   };
 
@@ -453,7 +449,14 @@ const ProfVersion = ({ myName, match, history }) => {
       alert('더 이상 앞으로 갈 수 없습니다.');
     } else {
       setIndexNum(indexNum - 1);
-      console.log(indexNum);
+    }
+  };
+
+  const isMyFeedBack = () => {
+    if (!isMyUID) {
+      return <div></div>;
+    } else if (isMyUID[indexNum] === authService.currentUser.uid) {
+      return <UpdateButton>피드백 수정하기</UpdateButton>;
     }
   };
 
@@ -505,7 +508,7 @@ const ProfVersion = ({ myName, match, history }) => {
                 <>
                   {line !== '' ? (
                     <span>
-                      {i++} : {line}
+                      {j++} : {line}
                       <br />
                     </span>
                   ) : (
@@ -537,6 +540,8 @@ const ProfVersion = ({ myName, match, history }) => {
         </FeedBackContainer>
         <Label>총평</Label>
         <CritiqueContainer>{critique[indexNum]}</CritiqueContainer>
+        {/* <UpdateButton>피드백 수정하기</UpdateButton> */}
+        {isMyFeedBack()}
         <SpaceContainer />
       </Box>
     </StyledContainer>

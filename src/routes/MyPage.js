@@ -78,7 +78,7 @@ const MyPageMenu = ({
         <Input
           placeholder="Enter your name here"
           onChange={(e) => inputOnChange(e)}
-          value={myName}
+          value={myName || ''}
         />
         <SearchButton type="submit" onClick={searchOnClick}>
           <img
