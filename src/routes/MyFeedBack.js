@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import {
   StyledChart,
@@ -10,6 +10,11 @@ import {
   FeedBackBox,
   ChangeButton,
   Box,
+  InputContainer,
+  SelectBox,
+  UnderLabel,
+  InputBox,
+  Button,
 } from 'routes/Translate.js';
 import { dbService, authService } from 'fbase.js';
 import dummyData from 'dummyData.js';
@@ -339,6 +344,7 @@ const ProfVersion = ({ myName, match, history }) => {
   const [indexNum, setIndexNum] = useState(0);
   const [isMyUID, setIsMyUID] = useState();
   const [professorFeedBack, setProfessorFeedBack] = useState([]);
+  const [isModifying, setIsModifying] = useState(false);
   let i = 1;
   let j = 1;
   const getMyScript = async () => {
@@ -454,9 +460,40 @@ const ProfVersion = ({ myName, match, history }) => {
 
   const isMyFeedBack = () => {
     if (!isMyUID) {
-      return <div></div>;
+      return;
     } else if (isMyUID[indexNum] === authService.currentUser.uid) {
-      return <UpdateButton>피드백 수정하기</UpdateButton>;
+      return (
+        <UpdateButton onClick={modifyOnClick}>피드백 수정하기</UpdateButton>
+      );
+    }
+  };
+
+  const modifyOnClick = () => {
+    setIsModifying(true);
+  };
+
+  const setFeedBackInput = () => {
+    if (!isModifying) {
+      return;
+    } else {
+      return (
+        <InputContainer>
+          <SelectBox
+          // setValue={setValue}
+          // setOptions={setOptions}
+          // options={options}
+          // value={value}
+          // nextId={nextId}
+          // selectedText={selectedText}
+          />
+          <UnderLabel>
+            새로운 항목을 원하실 경우, 위 항목선택박스에 항목이름을 직접 입력한
+            뒤, 엔터를 눌러주세요.
+          </UnderLabel>
+          <InputBox />
+          <Button></Button>
+        </InputContainer>
+      );
     }
   };
 
@@ -522,6 +559,7 @@ const ProfVersion = ({ myName, match, history }) => {
           </TextField>
           <ChangeButton onClick={plusId}>+</ChangeButton>
         </TextContainer>
+        {/* {setFeedBackInput()} */}
         <FeedBackContainer style={{ marginTop: '15px' }}>
           <FeedBackList>
             {feedBackList &&
@@ -540,7 +578,6 @@ const ProfVersion = ({ myName, match, history }) => {
         </FeedBackContainer>
         <Label>총평</Label>
         <CritiqueContainer>{critique[indexNum]}</CritiqueContainer>
-        {/* <UpdateButton>피드백 수정하기</UpdateButton> */}
         {isMyFeedBack()}
         <SpaceContainer />
       </Box>

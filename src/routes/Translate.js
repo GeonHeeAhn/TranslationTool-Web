@@ -407,7 +407,6 @@ function Translate({ match, history }) {
     ) {
       Arr = Arr.reverse();
     }
-    console.log(Arr);
     setstudentScript(Arr);
   };
 
@@ -782,4 +781,9 @@ export {
   Box,
   FinalComment,
   ChangeButton,
+  InputContainer,
+  SelectBox,
+  UnderLabel,
+  InputBox,
+  Button,
 };
