@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'routes/Menu';
 import dummyData from '../dummyData.js';
@@ -10,7 +10,7 @@ const Student = ({ match, history }) => {
   );
   const [transText, setTransText] = useState('');
   const [id, setId] = useState('');
-  const [data, setData] = useState([]);
+  const [mySavedtxt, setMySavedtxt] = useState();
 
   const translateOnChange = (e) => {
     e.preventDefault();
@@ -21,19 +21,33 @@ const Student = ({ match, history }) => {
     setId(e.target.value);
   };
 
-  const downloadOnClick = async ({ userObj }) => {
+  const loadSavedTask = async () => {
+    const arr = [];
+    const db = await dbService.collection('studentTemporaryStorage').get();
+    for (const document of db.docs) {
+      const data = { ...document.data(), docID: document.id };
+      arr.push(data);
+    }
+    const filterByScriptID = arr.filter(
+      (el) => el.scriptID === match.params.id
+    );
+    const filterByUID = filterByScriptID.filter(
+      (el) => el.userID === authService.currentUser.uid
+    );
+    console.log(filterByUID);
+    if (filterByUID.length > 0) {
+      setMySavedtxt(filterByUID);
+      setTransText(filterByUID[0].translate_txt);
+    } else if (filterByUID.length === 0) {
+      setMySavedtxt([]);
+    }
+  };
+
+  const submitOnClick = async () => {
     if (id === null || id === '') {
       window.alert('학번을 입력해주세요.');
       return false;
     } else {
-      const datas = {
-        studentID: id,
-        scriptID: studentData.id,
-        translate_txt: transText,
-        // userID: userObj.uid,
-      };
-      setData([...data, datas]);
-      // await dbService.collection('student').add({
       await dbService.collection('student').add({
         studentID: id,
         scriptID: studentData.id,
@@ -46,16 +60,42 @@ const Student = ({ match, history }) => {
     }
   };
 
+  const saveOnClick = async () => {
+    if (!mySavedtxt) {
+      window.alert('loading');
+    } else if (mySavedtxt.length === 0) {
+      await dbService.collection('studentTemporaryStorage').add({
+        studentID: id,
+        scriptID: studentData.id,
+        translate_txt: transText,
+        userID: authService.currentUser.uid,
+      });
+    } else if (mySavedtxt.length > 0) {
+      dbService
+        .collection('studentTemporaryStorage')
+        .doc(mySavedtxt[0].docID)
+        .update({
+          translate_txt: transText,
+        });
+    }
+    window.alert('과제가 저장되었습니다.');
+  };
+
+  useEffect(() => {
+    loadSavedTask();
+  }, []);
+
   return (
-    <Container>
+    <>
       <TextContainer>
         <Script>{studentData.script}</Script>
-        {console.log(authService.currentUser.uid)}
         <Translate
           placeholder="Textarea"
           value={transText}
           onChange={translateOnChange}
-        ></Translate>
+        >
+          {transText}
+        </Translate>
       </TextContainer>
       <BottomContainer>
         <IdInput
@@ -63,9 +103,10 @@ const Student = ({ match, history }) => {
           value={id}
           onChange={inputOnChange}
         />
-        <StyledButton onClick={downloadOnClick}>Submit</StyledButton>
+        <StyledButton onClick={saveOnClick}>Save</StyledButton>
+        <StyledButton onClick={submitOnClick}>Submit</StyledButton>
       </BottomContainer>
-    </Container>
+    </>
   );
 };
 

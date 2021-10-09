@@ -20,6 +20,7 @@ import { dbService, authService } from 'fbase.js';
 import dummyData from 'dummyData.js';
 import { wrapper } from 'text-wrapper';
 import { SpaceContext } from 'antd/lib/space';
+import { Student } from 'routes/Student.js';
 
 const Chart = ({ options, chartValue }) => {
   let rankColor = [
@@ -107,7 +108,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const sortingFunction = () => {
     if (scriptList === undefined) {
       setWhichCase(2);
-      window.alert('해당 과제를 제출하지 않았습니다. ');
+      // window.alert('해당 과제를 제출하지 않았습니다. ');
       // history.goBack();
     } else {
       setWhichCase(1);
@@ -123,7 +124,6 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
       sortingFunction();
     } else {
       setDocID(scriptList.docID);
-      console.log(DocID);
       setMyScript(scriptList.translate_txt);
     }
   };
@@ -237,7 +237,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
     if (!DocID) {
       window.alert('loading');
     } else {
-      dbService.collection('studentTest').doc(DocID).update({
+      dbService.collection('student').doc(DocID).update({
         translate_txt: changedTask,
       });
       window.alert('수정완료');
@@ -324,7 +324,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
         </Box>
       );
     } else {
-      return <div>과제를 제출해주세요</div>;
+      return <Student match={match} history={history} />;
     }
   };
 
@@ -348,7 +348,7 @@ const ProfVersion = ({ myName, match, history }) => {
   let i = 1;
   let j = 1;
   const getMyScript = async () => {
-    const dbScript = await dbService.collection('studentTest').get();
+    const dbScript = await dbService.collection('student').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push(document.data());
@@ -395,7 +395,7 @@ const ProfVersion = ({ myName, match, history }) => {
 
   const getMyFeedBack = async () => {
     const arr = [];
-    const dbScript = await dbService.collection('professorTest').get();
+    const dbScript = await dbService.collection('professor').get();
     for (const document of dbScript.docs) {
       arr.push(document.data());
     }
