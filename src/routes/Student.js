@@ -11,6 +11,7 @@ const Student = ({ match, history }) => {
   const [transText, setTransText] = useState('');
   const [id, setId] = useState('');
   const [mySavedtxt, setMySavedtxt] = useState();
+  const [isSaved, setIsSaved] = useState(false);
 
   const translateOnChange = (e) => {
     e.preventDefault();
@@ -48,15 +49,19 @@ const Student = ({ match, history }) => {
       window.alert('학번을 입력해주세요.');
       return false;
     } else {
-      await dbService.collection('student').add({
-        studentID: id,
-        scriptID: studentData.id,
-        translate_txt: transText,
-        userID: authService.currentUser.uid,
-      });
-      setId('');
-      history.goBack();
-      window.alert('과제 제출이 정상적으로 처리되었습니다. ');
+      if (!isSaved) {
+        window.alert('저장을 먼저 해주세요');
+      } else {
+        await dbService.collection('student').add({
+          studentID: id,
+          scriptID: studentData.id,
+          translate_txt: transText,
+          userID: authService.currentUser.uid,
+        });
+        setId('');
+        history.goBack();
+        window.alert('과제 제출이 정상적으로 처리되었습니다. ');
+      }
     }
   };
 
@@ -78,6 +83,7 @@ const Student = ({ match, history }) => {
           translate_txt: transText,
         });
     }
+    setIsSaved(true);
     window.alert('과제가 저장되었습니다.');
   };
 

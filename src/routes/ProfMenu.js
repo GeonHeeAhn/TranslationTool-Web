@@ -36,7 +36,15 @@ const SelectList = ({ match }) => {
   return (
     <StyledContainer>
       {dummyData.student_data.map((item) => (
-        <Link to={`${match.url}/${item.id}`}>
+        <Link
+          to={{
+            pathname: `${match.url}/${item.id}`,
+            state: {
+              fromWhere: 'newFeedback',
+              studentID: '',
+            },
+          }}
+        >
           <StyledButton>{item.label}</StyledButton>
         </Link>
       ))}
@@ -48,7 +56,13 @@ const ProfMenu = ({ match }) => {
   return (
     <>
       <Route exact path={match.path} component={SelectList} />
-      <Route path={`${match.path}/:id`} component={Translate} />
+      <Route
+        path={`${match.path}/:id`}
+        component={Translate}
+        // render={(props) => (
+        //   <Translate {...props} fromWhere="newFeedback" studentID="" />
+        // )}
+      />
     </>
   );
 };

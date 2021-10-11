@@ -88,11 +88,14 @@ const Chart1 = ({ options, chartValue }) => {
 const BottomContainer = ({
   studentScript,
   profId,
-  feedBack,
   finalComment,
   setFinalComment,
   setProfId,
   history,
+  mySavings,
+  loadedFeedback,
+  isSaved,
+  setIsSaved,
 }) => {
   const CommentOnChange = (e) => {
     e.preventDefault();
@@ -100,18 +103,45 @@ const BottomContainer = ({
   };
 
   const onSubmit = async () => {
-    await dbService.collection('professorTest').add({
-      // student_Name: studentScript[0].studentID,
-      student_name: studentScript[0].studentID,
-      student_ID: studentScript[0].userID,
-      script_ID: studentScript[0].scriptID,
-      professor_name: profId,
-      professor_ID: authService.currentUser.uid,
-      feedBack: feedBack,
-      general_critique: finalComment,
-    });
-    window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
-    history.goBack();
+    if (!isSaved) {
+      window.alert('저장을 먼저 해주세요');
+    } else {
+      await dbService.collection('professorTest').add({
+        student_name: studentScript[0].studentID,
+        student_ID: studentScript[0].userID,
+        script_ID: studentScript[0].scriptID,
+        professor_name: profId,
+        professor_ID: authService.currentUser.uid,
+        feedBack: loadedFeedback,
+        general_critique: finalComment,
+      });
+      window.alert('과제 피드백이 정상적으로 처리되었습니다. ');
+      history.goBack();
+    }
+  };
+
+  const onSave = async () => {
+    if (!mySavings) {
+      window.alert('loading');
+    } else if (mySavings.length === 0) {
+      await dbService.collection('professorTemporaryStorage').add({
+        student_ID: studentScript[0].userID,
+        script_ID: studentScript[0].scriptID,
+        professor_ID: authService.currentUser.uid,
+        feedBack: loadedFeedback,
+        general_critique: finalComment,
+      });
+    } else if (mySavings.length > 0) {
+      dbService
+        .collection('professorTemporaryStorage')
+        .doc(mySavings[0].docID)
+        .update({
+          feedBack: loadedFeedback,
+          general_critique: finalComment,
+        });
+    }
+    setIsSaved(true);
+    window.alert('과제 피드백이 임시저장 되었습니다. ');
   };
 
   const inputOnChange = (e) => {
@@ -132,6 +162,7 @@ const BottomContainer = ({
           value={profId}
           onChange={inputOnChange}
         />
+        <SubmitButton onClick={onSave}>저장하기</SubmitButton>
         <SubmitButton onClick={onSubmit}>제출하기</SubmitButton>
       </RowFlexBox>
     </FinalCommentContainer>
@@ -303,47 +334,40 @@ const SelectBox = ({
 };
 
 const FeedBack = ({
-  id,
-  setFeedBack,
-  feedBack,
-  FBId,
+  setLoadedFeedback,
+  loadedFeedback,
   options,
   chartValue,
   setChartValue,
 }) => {
-  const deleteElement = (id, comment) => {
-    console.log(id, comment, chartValue, options, setChartValue);
-    deleteChart(comment, chartValue, options, setChartValue);
-    setFeedBack(feedBack.filter((fb) => fb.id !== id));
-    FBId.current -= 1;
+  const deleteElement = (id, feedBack, comment) => {
+    deleteChart(feedBack, chartValue, options, setChartValue);
+    setLoadedFeedback(
+      loadedFeedback.filter((fb) => fb.id !== id && fb.comment !== comment)
+    );
+    i--;
   };
+  let i = 1;
 
   return (
     <FeedBackContainer>
       <FeedBackList>
-        {feedBack.map((el) => (
-          <FeedBackBox key={el.id}>
-            <div>
-              {el.id} . {el.feedBack} : {el.comment}
-            </div>
-            <div>
-              {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-              <Button
-                onClick={() =>
-                  deleteElement(
-                    el.id,
-                    el.feedBack,
-                    chartValue,
-                    options,
-                    setChartValue
-                  )
-                }
-              >
-                Delete
-              </Button>
-            </div>
-          </FeedBackBox>
-        ))}
+        {loadedFeedback &&
+          loadedFeedback.map((el) => (
+            <FeedBackBox key={el.id}>
+              <div>
+                {i++} . {el.feedBack} : {el.comment}
+              </div>
+              <div>
+                {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
+                <Button
+                  onClick={() => deleteElement(el.id, el.feedBack, el.comment)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </FeedBackBox>
+          ))}
       </FeedBackList>
       <Chart1 options={options} chartValue={chartValue} />
     </FeedBackContainer>
@@ -354,26 +378,32 @@ const StudentInfoBox = ({ IsStudentNameEmpty }) => {
   return <StudentName>제출자 : {IsStudentNameEmpty()}</StudentName>;
 };
 
-const deleteChart = (comment, chartValue, options, setChartValue) => {
+const deleteChart = (feedBack, chartValue, options, setChartValue) => {
   let arr = chartValue;
+  console.log(arr);
   const targetIdx = options.findIndex((item) => {
-    return item.label === comment;
+    return item.label === feedBack;
   });
   arr[targetIdx] -= 1;
+  console.log(arr);
   setChartValue(arr);
 };
 
-function Translate({ match, history }) {
+function Translate({ match, history, location }) {
   const [inputText, setInputText] = useState('');
   const [studentScript, setstudentScript] = useState([]);
   const [num, setNum] = useState(0);
   const [profId, setProfId] = useState('');
   const [indexNumber, setIndexNumber] = useState();
+  const [studNum, setStudNum] = useState();
   const [originalScript, setOriginalScript] = useState([]);
   const [finalComment, setFinalComment] = useState('');
   const [value, setValue] = useState();
   const [options, setOptions] = useState(dummyData.options);
   const [chartValue, setChartValue] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [mySavings, setMySavings] = useState();
+  const [loadedFeedback, setLoadedFeedback] = useState();
+  const [isSaved, setIsSaved] = useState(false);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -381,16 +411,9 @@ function Translate({ match, history }) {
       text: '',
     },
   ]);
-  const [feedBack, setFeedBack] = useState([
-    {
-      id: '',
-      feedBack: '',
-      comment: '',
-      selectedText: '',
-    },
-  ]);
   const nextId = useRef(0);
-  const FBId = useRef(1);
+  const fromWhere = location.state.fromWhere;
+  const studentID = location.state.studentID;
   const getScripts = async () => {
     const dbScript = await dbService.collection('studentTest').get();
     const arr = [];
@@ -440,28 +463,73 @@ function Translate({ match, history }) {
     }
   };
 
+  const loadSavings = async () => {
+    const arr = [];
+    let Arr = [];
+    const db = await dbService.collection('professorTemporaryStorage').get();
+    for (const document of db.docs) {
+      const data = { ...document.data(), docID: document.id };
+      arr.push(data);
+    }
+    const filterByScriptID = arr.filter(
+      (el) => el.script_ID === match.params.id
+    );
+    const filterByUID = filterByScriptID.filter(
+      (el) => el.professor_ID === authService.currentUser.uid
+    );
+    if (fromWhere === 'newFeedback') {
+      setMySavings(filterByUID); //배열 length >= 1
+      setFinalComment(filterByUID.map((a) => a.general_critique));
+      Arr = filterByUID.map((a) => a.feedBack);
+      setLoadedFeedback(Arr[0]);
+      console.log('filterbystudentID 없을 때', filterByUID);
+    } else {
+      const filterByStudentID = filterByUID.filter(
+        (el) => el.student_ID === studentID
+      );
+      setMySavings(filterByStudentID); //배열 length 0 or 1
+      setFinalComment(filterByStudentID.map((a) => a.general_critique));
+      Arr = filterByStudentID.map((a) => a.feedBack);
+      setLoadedFeedback(Arr[0]);
+      console.log('filterbystudentID 이쓸 때', filterByStudentID);
+    }
+    setStudNum(Arr[0].length);
+    // setFinalComment(mySavings.map((a) => a.general_critique));
+    const set = Arr[0].filter((element, index) => {
+      return Arr[0].indexOf(element) === index;
+    });
+    let idx = 0;
+    let array = chartValue;
+    for (let k = 0; k < set.length; k++) {
+      idx = options.findIndex((item) => {
+        return item.label === set[k].feedBack;
+      });
+      array[idx] += 1;
+    }
+    setChartValue(array); //reload 안되는 오류
+  };
+
   useEffect(() => {
-    feedBack.splice(0, 1);
     getScripts();
     IsStudentScriptEmpty();
     findScript();
     IsStudentNameEmpty();
+    loadSavings();
   }, []);
 
   const sendFeedBack = (e) => {
+    let j = loadedFeedback.length;
     if (value === undefined) {
       window.alert('카테고리를 선택해주세요.');
     } else {
       const FB = {
-        id: FBId.current,
+        id: ++j,
         feedBack: value.value,
         comment: inputText,
         selectedText: selectedText[nextId.current],
       };
-      setFeedBack([...feedBack, FB]);
-      console.log(value.value);
-      FBId.current += 1;
-      console.log(feedBack);
+      setLoadedFeedback([...loadedFeedback, FB]);
+      console.log(loadedFeedback);
       updateChart(value.value);
       setInputText('');
     }
@@ -536,22 +604,23 @@ function Translate({ match, history }) {
           />
           {InputLayout()}
           <FeedBack
-            list={feedBack}
-            setFeedBack={setFeedBack}
-            feedBack={feedBack}
-            FBId={FBId}
+            setLoadedFeedback={setLoadedFeedback}
             options={options}
             chartValue={chartValue}
             setChartValue={setChartValue}
+            loadedFeedback={loadedFeedback}
           />
           {BottomContainer({
             studentScript,
             profId,
-            feedBack,
             finalComment,
             setFinalComment,
             setProfId,
             history,
+            mySavings,
+            loadedFeedback,
+            isSaved,
+            setIsSaved,
           })}
         </Box>
       </StyledContainer>

@@ -21,6 +21,8 @@ import dummyData from 'dummyData.js';
 import { wrapper } from 'text-wrapper';
 import { SpaceContext } from 'antd/lib/space';
 import { Student } from 'routes/Student.js';
+import { Route, Link } from 'react-router-dom';
+import { Translate } from 'routes/Translate';
 
 const Chart = ({ options, chartValue }) => {
   let rankColor = [
@@ -331,7 +333,7 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   return <StyledContainer>{changeBody()}</StyledContainer>;
 };
 
-const ProfVersion = ({ myName, match, history }) => {
+const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
   const [myScript, setMyScript] = useState('loading');
   const [originalScript, setOriginalScript] = useState();
   const [feedBackList, setFeedBackList] = useState([]);
@@ -348,16 +350,17 @@ const ProfVersion = ({ myName, match, history }) => {
   let i = 1;
   let j = 1;
   const getMyScript = async () => {
-    const dbScript = await dbService.collection('student').get();
+    const dbScript = await dbService.collection('studentTest').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push(document.data());
     }
     const Arr = arr.filter((el) => el.scriptID === match.params.id);
     const myscript = Arr.find((el) => el.studentID === myName);
-    console.log('myScript', myScript);
+    console.log('studentScript', myScript);
     if (myscript) {
       setMyScript(myscript.translate_txt);
+      setStudentID(myscript.userID);
     }
   };
 
@@ -395,7 +398,7 @@ const ProfVersion = ({ myName, match, history }) => {
 
   const getMyFeedBack = async () => {
     const arr = [];
-    const dbScript = await dbService.collection('professor').get();
+    const dbScript = await dbService.collection('professorTest').get();
     for (const document of dbScript.docs) {
       arr.push(document.data());
     }
@@ -463,38 +466,25 @@ const ProfVersion = ({ myName, match, history }) => {
       return;
     } else if (isMyUID[indexNum] === authService.currentUser.uid) {
       return (
-        <UpdateButton onClick={modifyOnClick}>피드백 수정하기</UpdateButton>
+        <>
+          <Link
+            to={{
+              pathname: `/forprofessor/${match.params.id}`,
+              state: {
+                fromWhere: 'modify',
+                studentID: studentID,
+              },
+            }}
+          >
+            <UpdateButton onClick={modifyOnClick}>피드백 수정하기</UpdateButton>
+          </Link>
+        </>
       );
     }
   };
 
   const modifyOnClick = () => {
     setIsModifying(true);
-  };
-
-  const setFeedBackInput = () => {
-    if (!isModifying) {
-      return;
-    } else {
-      return (
-        <InputContainer>
-          <SelectBox
-          // setValue={setValue}
-          // setOptions={setOptions}
-          // options={options}
-          // value={value}
-          // nextId={nextId}
-          // selectedText={selectedText}
-          />
-          <UnderLabel>
-            새로운 항목을 원하실 경우, 위 항목선택박스에 항목이름을 직접 입력한
-            뒤, 엔터를 눌러주세요.
-          </UnderLabel>
-          <InputBox />
-          <Button></Button>
-        </InputContainer>
-      );
-    }
   };
 
   useEffect(() => {
@@ -559,7 +549,6 @@ const ProfVersion = ({ myName, match, history }) => {
           </TextField>
           <ChangeButton onClick={plusId}>+</ChangeButton>
         </TextContainer>
-        {/* {setFeedBackInput()} */}
         <FeedBackContainer style={{ marginTop: '15px' }}>
           <FeedBackList>
             {feedBackList &&
@@ -593,6 +582,7 @@ const MyFeedBack = ({
   myScriptList,
   isStudent,
 }) => {
+  const [studentID, setStudentID] = useState();
   return (
     <>
       {isStudent ? (
@@ -605,7 +595,16 @@ const MyFeedBack = ({
           isStudent={isStudent}
         />
       ) : (
-        <ProfVersion myName={myName} match={match} history={history} />
+        <>
+          <ProfVersion
+            myName={myName}
+            match={match}
+            history={history}
+            setStudentID={setStudentID}
+            studentID={studentID}
+          />
+          <Route path={`/forprofessor/:id`} component={Translate} />
+        </>
       )}
     </>
   );

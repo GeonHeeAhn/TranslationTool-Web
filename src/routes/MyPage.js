@@ -54,7 +54,6 @@ const MyPageMenu = ({
     }
     let Arr = [];
     Arr = arr.filter((el) => el.userID === authService.currentUser.uid);
-    console.log(Arr);
     setMyScriptList(Arr);
   };
 
