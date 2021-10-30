@@ -6,7 +6,6 @@ import dummyData from '../dummyData.js';
 import { dbService, authService } from 'fbase.js';
 import { Container, IdInput, StyledButton } from 'routes/Student.js';
 import { Doughnut } from 'react-chartjs-2';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
 import labels from 'chartjs-plugin-labels';
 
 const Chart1 = ({ options, chartValue }) => {
@@ -48,11 +47,6 @@ const Chart1 = ({ options, chartValue }) => {
       legend: {
         display: true,
       },
-      // datalabels: {
-      //   display: true,
-      //   color: 'white',
-      //   render: 'label',
-      // },
       labels: {
         fontSize: 11,
         fontColor: '#fff',
@@ -180,6 +174,10 @@ const TextBox = ({
   setNum,
   isOriginalScriptEmpty,
   IsStudentScriptEmpty,
+  hoverComment,
+  isHover,
+  thisistext,
+  scriptfor,
 }) => {
   let i = 1;
   let j = 1;
@@ -196,9 +194,7 @@ const TextBox = ({
 
     const select = {
       id: nextId.current,
-      indexNum: parseInt(
-        (studentScript[num].translate_txt.indexOf(sentence) + 38) / 38
-      ),
+      indexNum: parseInt((originalScript.script.indexOf(sentence) + 38) / 38),
       text: window.getSelection().toString(),
     };
     console.log(studentScript[num].translate_txt.indexOf(sentence));
@@ -258,46 +254,32 @@ const TextBox = ({
     <TextContainer>
       <ChangeButton onClick={minusId}>-</ChangeButton>
       <TextField onClick={originalDragAndSelect}>
-        {WrappedBefore.split('\n').map((line) => {
-          return (
-            <>
-              {line !== '' ? (
-                <span>
-                  {i++} : {line}
-                  <br />
-                </span>
-              ) : (
-                <span>
-                  {line} <br />
-                </span>
-              )}
-            </>
-          );
-        })}
+        {isHover ? (
+          <Highlighter text={thisistext} hoverComment={hoverComment} />
+        ) : (
+          <>{thisistext}</>
+        )}
       </TextField>
       <TextField className="TranslateField" onClick={dragAndSelect}>
-        {WrappedAfter.split('\n').map((line) => {
-          return (
-            <>
-              {line !== '' ? (
-                <span>
-                  {j++} : {line}
-                  <br />
-                </span>
-              ) : (
-                <span>
-                  {line} <br />
-                </span>
-              )}
-            </>
-          );
-        })}
+        {isHover ? (
+          <Highlighter text={scriptfor} hoverComment={hoverComment} />
+        ) : (
+          <>{scriptfor}</>
+        )}
       </TextField>
       <ChangeButton onClick={plusId}>+</ChangeButton>
     </TextContainer>
   );
 };
 
+const Highlighter = ({ text, hoverComment }) => {
+  const newComment = `${(<mark>{hoverComment}</mark>)}`;
+  const html = '<mark>{hoverComment}</mark>';
+  const newtxt = text?.replace(hoverComment, html);
+  const a = newtxt?.replace('{hoverComment}', hoverComment);
+
+  return <div dangerouslySetInnerHTML={{ __html: a }} />;
+};
 const SelectBox = ({
   setValue,
   setOptions,
@@ -339,6 +321,9 @@ const FeedBack = ({
   options,
   chartValue,
   setChartValue,
+  setHoverComment,
+  hoverComment,
+  setIsHover,
 }) => {
   const deleteElement = (id, feedBack, comment) => {
     deleteChart(feedBack, chartValue, options, setChartValue);
@@ -354,7 +339,17 @@ const FeedBack = ({
       <FeedBackList>
         {loadedFeedback &&
           loadedFeedback.map((el) => (
-            <FeedBackBox key={el.id}>
+            <FeedBackBox
+              key={el.id}
+              onMouseOver={() => {
+                const arr = [el.selectedText.text];
+                setHoverComment(arr);
+                setIsHover(true);
+              }}
+              onMouseOut={() => {
+                setIsHover(false);
+              }}
+            >
               <div>
                 {i++} . {el.feedBack} : {el.comment}
               </div>
@@ -404,6 +399,8 @@ function Translate({ match, history, location }) {
   const [mySavings, setMySavings] = useState();
   const [loadedFeedback, setLoadedFeedback] = useState();
   const [isSaved, setIsSaved] = useState(false);
+  const [hoverComment, setHoverComment] = useState([]);
+  const [isHover, setIsHover] = useState(false);
   const [selectedText, setSelectedText] = useState([
     {
       id: '',
@@ -412,6 +409,7 @@ function Translate({ match, history, location }) {
     },
   ]);
   const nextId = useRef(0);
+  const [scriptfor, setScriptfor] = useState('loading');
   const fromWhere = location.state.fromWhere;
   const studentID = location.state.studentID;
   const getScripts = async () => {
@@ -437,6 +435,7 @@ function Translate({ match, history, location }) {
     if (studentScript.length === 0) {
       return 'loading';
     } else {
+      setScriptfor(studentScript[num].translate_txt);
       return studentScript[num].translate_txt;
     }
   };
@@ -463,6 +462,8 @@ function Translate({ match, history, location }) {
     }
   };
 
+  let thisistext = isOriginalScriptEmpty();
+
   const loadSavings = async () => {
     const arr = [];
     let Arr = [];
@@ -481,7 +482,7 @@ function Translate({ match, history, location }) {
       setMySavings(filterByUID); //배열 length >= 1
       setFinalComment(filterByUID.map((a) => a.general_critique));
       Arr = filterByUID.map((a) => a.feedBack);
-      setLoadedFeedback(Arr[0]);
+      setLoadedFeedback(Arr);
       console.log('filterbystudentID 없을 때', filterByUID);
     } else {
       const filterByStudentID = filterByUID.filter(
@@ -490,13 +491,13 @@ function Translate({ match, history, location }) {
       setMySavings(filterByStudentID); //배열 length 0 or 1
       setFinalComment(filterByStudentID.map((a) => a.general_critique));
       Arr = filterByStudentID.map((a) => a.feedBack);
-      setLoadedFeedback(Arr[0]);
+      setLoadedFeedback(Arr);
       console.log('filterbystudentID 이쓸 때', filterByStudentID);
     }
-    setStudNum(Arr[0].length);
+    setStudNum(Arr.length);
     // setFinalComment(mySavings.map((a) => a.general_critique));
-    const set = Arr[0].filter((element, index) => {
-      return Arr[0].indexOf(element) === index;
+    const set = Arr.filter((element, index) => {
+      return Arr.indexOf(element) === index;
     });
     let idx = 0;
     let array = chartValue;
@@ -589,6 +590,7 @@ function Translate({ match, history, location }) {
       <GlobalStyle />
       <StyledContainer>
         <Box>
+          {console.log('hoverComment', hoverComment)}
           <StudentInfoBox IsStudentNameEmpty={IsStudentNameEmpty} />
           <TextBox
             studentScript={studentScript}
@@ -601,6 +603,10 @@ function Translate({ match, history, location }) {
             setNum={setNum}
             isOriginalScriptEmpty={isOriginalScriptEmpty}
             IsStudentScriptEmpty={IsStudentScriptEmpty}
+            hoverComment={hoverComment}
+            isHover={isHover}
+            thisistext={thisistext}
+            scriptfor={scriptfor}
           />
           {InputLayout()}
           <FeedBack
@@ -609,6 +615,9 @@ function Translate({ match, history, location }) {
             chartValue={chartValue}
             setChartValue={setChartValue}
             loadedFeedback={loadedFeedback}
+            setHoverComment={setHoverComment}
+            hoverComment={hoverComment}
+            setIsHover={setIsHover}
           />
           {BottomContainer({
             studentScript,
