@@ -1,18 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
-import { authService } from '../fbase';
+import { dbService, authService } from '../fbase';
+import Modal from './userInfoModal';
+import OutsideAlerter from './outsideAlerter';
 
 const Menu = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   let history = useHistory();
   const onLogOutClick = () => {
     authService.signOut();
     history.push('/');
   };
 
+  const getUserInitialInfo = async () => {
+    const dbScript = await dbService.collection('userInfo').get();
+    const arr = [];
+    for (const document of dbScript.docs) {
+      arr.push({
+        ...document.data(),
+      });
+    }
+    if (!arr.find((userid) => userid === authService.uid)) {
+      console.log('업슴');
+      setIsModalVisible(true);
+    }
+  };
+
+  useEffect(() => {
+    getUserInitialInfo();
+  }, []);
+
   return (
     <Container>
+      <Modal
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+      />
+      ;
       <Link to="/myPage">
         <Button>학생용</Button>
       </Link>
