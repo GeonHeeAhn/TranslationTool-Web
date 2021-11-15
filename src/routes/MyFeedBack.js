@@ -557,9 +557,7 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
                   <div>
                     {el.id} . {el.feedBack} : {el.comment}
                   </div>
-                  <div>
-                    {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-                  </div>
+                  <div>{el.selectedText.text}</div>
                 </FeedBackBox>
               ))}
           </FeedBackList>

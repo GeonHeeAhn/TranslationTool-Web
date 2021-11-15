@@ -280,6 +280,7 @@ const Highlighter = ({ text, hoverComment }) => {
 
   return <div dangerouslySetInnerHTML={{ __html: a }} />;
 };
+
 const SelectBox = ({
   setValue,
   setOptions,
@@ -327,6 +328,11 @@ const FeedBack = ({
 }) => {
   const deleteElement = (id, feedBack, comment) => {
     deleteChart(feedBack, chartValue, options, setChartValue);
+    console.log('delete이전', loadedFeedback);
+    console.log(
+      'delete후',
+      loadedFeedback.filter((fb) => fb.id !== id)
+    );
     setLoadedFeedback(
       loadedFeedback.filter((fb) => fb.id !== id && fb.comment !== comment)
     );
@@ -354,7 +360,7 @@ const FeedBack = ({
                 {i++} . {el.feedBack} : {el.comment}
               </div>
               <div>
-                {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
+                {el.selectedText.text}
                 <Button
                   onClick={() => deleteElement(el.id, el.feedBack, el.comment)}
                 >
