@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import OutsideAlerter from './outsideAlerter';
+import { Switch } from '@nextui-org/react';
+import { Input } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 
-const ModalContent = () => {
+const ModalContent = ({ setIsSelected }) => {
+  const switchOnChange = (checked) => {
+    console.log(`switch to ${checked}`);
+  };
+
   return (
     <BodyContainer>
-      <Label>** 선택</Label>
-      <SelectBox>
-        <SelectButton>교수</SelectButton>
-        <SelectButton>학생</SelectButton>
-      </SelectBox>
-      <Label>학과 선택</Label>
-      <SelectBox>
-        <SelectButton>중국어</SelectButton>
-        <SelectButton>한국어</SelectButton>
-      </SelectBox>
-      <Label>학기 선택</Label>
-      <SelectBox>
-        <SelectButton>1학기</SelectButton>
-        <SelectButton>2학기</SelectButton>
-      </SelectBox>
-      <Button>submit</Button>
+      <Title>회원정보</Title>
+      <TextLabel>학번/교번</TextLabel>
+      <Input size="large" placeholder="학번/교번을 입력해주세요." />
+      <TextLabel>이름</TextLabel>
+      <Input size="large" placeholder="이름을 입력해주세요." />
+      <RowComponent>
+        <TextLabel>학생인가요?</TextLabel>
+        <Switch initialChecked size="large" />
+      </RowComponent>
+      <Button flat color="primary" rounded auto>
+        저장
+      </Button>
     </BodyContainer>
   );
 };
@@ -28,6 +31,7 @@ const ModalContent = () => {
 const ModalWindow = ({ isModalVisible, setIsModalVisible }) => {
   return (
     <>
+      <GlobalStyle />
       <ModalBackground isModalVisible={isModalVisible}>
         <OutsideAlerter setIsModalVisible={setIsModalVisible}>
           <Modal isModalVisible={isModalVisible}>
@@ -41,6 +45,14 @@ const ModalWindow = ({ isModalVisible, setIsModalVisible }) => {
 
 export default ModalWindow;
 
+const GlobalStyle = createGlobalStyle`
+  .button.jsx-129748894 {
+    height: 50px !important;
+  }
+  .text.jsx-129748894{
+    font-size: 16px;
+  }
+`;
 const Modal = styled.div`
   position: absolute;
   top: 50%;
@@ -48,7 +60,7 @@ const Modal = styled.div`
   transform: translate(-50%, -50%);
   width: 400px;
   height: 500px;
-  background-color: grey;
+  background-color: white;
   border-radius: 50px;
   opacity: ${(props) => (props.isModalVisible ? '1' : '0')};
   visibility: ${(props) => (props.isModalVisible ? 'visible' : 'hidden')};
@@ -59,6 +71,7 @@ const Modal = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
 `;
 
 const ModalBackground = styled.div`
@@ -67,7 +80,7 @@ const ModalBackground = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.5);
   visibility: ${(props) => (props.isModalVisible ? 'visible' : 'hidden')};
   transition: ${(props) =>
     props.isModalVisible
@@ -75,55 +88,34 @@ const ModalBackground = styled.div`
       : 'opacity 500ms , visibility 500ms'};
 `;
 
-const Label = styled.div`
-  font-size: 1.125rem;
-  font-weight: normal;
-  color: #b0b1b6;
+const Title = styled.label`
+  font-size: 30px;
+  font-weight: Bold;
   text-align: center;
   word-break: break-word;
+  margin-bottom: 20px;
 `;
 
-const Button = styled.button`
-  border-radius: 100px;
-  padding: 18px 14px;
-  margin-bottom: 40px;
-  font-weight: normal;
-  text-align: center;
-  font-size: 1rem;
-  color: #ffffff;
-  line-height: 1.5rem;
-  background-color: #3562ff;
-  border: none;
-  width: 246px;
-  z-index: 999;
-  :disabled {
-    background-color: #393a3f;
-  }
+const TextLabel = styled.label`
+  font-size: 16px;
+  margin-top: 15px;
+  margin-bottom: 10px;
 `;
 
-const SelectBox = styled.div`
-  width: 70%;
+const RowComponent = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  background-color: none;
-`;
-
-const SelectButton = styled.button`
-  border-radius: 30px;
-  width: 100px;
-  height: 80px;
-  color: rgb(0, 0, 0);
-  background-color: ${(props) => (props.isSelected ? '#f6f6f6' : '#f9f9f9')};
-  border: none;
+  margin-bottom: 35px;
+  margin-top: 10px;
 `;
 
 const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
+  padding: 30px 50px 30px 50px;
   width: 100%;
   height: 100%;
   overflow-y: auto;

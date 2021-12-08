@@ -35,10 +35,10 @@ const Menu = () => {
   return (
     <Container>
       <Modal
+        style={{ zIndex: '999' }}
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
       />
-      ;
       <Link to="/myPage">
         <Button>학생용</Button>
       </Link>
