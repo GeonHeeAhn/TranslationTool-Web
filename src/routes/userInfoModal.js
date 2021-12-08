@@ -4,24 +4,65 @@ import OutsideAlerter from './outsideAlerter';
 import { Switch } from '@nextui-org/react';
 import { Input } from '@nextui-org/react';
 import { Button } from '@nextui-org/react';
+import { dbService, authService } from 'fbase';
 
-const ModalContent = ({ setIsSelected }) => {
+const ModalContent = ({ setIsSelected, setIsModalVisible }) => {
+  const [personalID, setPersonalID] = useState('');
+  const [name, setName] = useState('');
+  const [isStudent, setIsStudent] = useState('student');
+
   const switchOnChange = (checked) => {
-    console.log(`switch to ${checked}`);
+    checked.target.checked
+      ? setIsStudent('student')
+      : setIsStudent('professor');
+  };
+
+  const idOnChange = (e) => {
+    e.preventDefault();
+    setPersonalID(e.target.value);
+  };
+
+  const nameOnChange = (e) => {
+    e.preventDefault();
+    setName(e.target.value);
+  };
+
+  const saveOnClick = async () => {
+    if (name === '' || personalID === '') {
+      window.alert('회원정보를 정확히 입력해주세요. ');
+    } else {
+      await dbService.collection('userInformation').add({
+        userID: authService.currentUser.uid,
+        personalID: personalID,
+        name: name,
+        isStudent: isStudent,
+      });
+      setIsModalVisible(false);
+    }
   };
 
   return (
     <BodyContainer>
       <Title>회원정보</Title>
       <TextLabel>학번/교번</TextLabel>
-      <Input size="large" placeholder="학번/교번을 입력해주세요." />
+      <Input
+        size="large"
+        placeholder="학번/교번을 입력해주세요."
+        value={personalID}
+        onChange={idOnChange}
+      />
       <TextLabel>이름</TextLabel>
-      <Input size="large" placeholder="이름을 입력해주세요." />
+      <Input
+        size="large"
+        placeholder="이름을 입력해주세요."
+        value={name}
+        onChange={nameOnChange}
+      />
       <RowComponent>
         <TextLabel>학생인가요?</TextLabel>
-        <Switch initialChecked size="large" />
+        <Switch initialChecked size="large" onChange={switchOnChange} />
       </RowComponent>
-      <Button flat color="primary" rounded auto>
+      <Button flat color="primary" rounded auto onClick={saveOnClick}>
         저장
       </Button>
     </BodyContainer>
@@ -35,7 +76,7 @@ const ModalWindow = ({ isModalVisible, setIsModalVisible }) => {
       <ModalBackground isModalVisible={isModalVisible}>
         <OutsideAlerter setIsModalVisible={setIsModalVisible}>
           <Modal isModalVisible={isModalVisible}>
-            <ModalContent />
+            <ModalContent setIsModalVisible={setIsModalVisible} />
           </Modal>
         </OutsideAlerter>
       </ModalBackground>

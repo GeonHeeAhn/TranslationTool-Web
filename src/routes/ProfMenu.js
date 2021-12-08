@@ -56,13 +56,7 @@ const ProfMenu = ({ match }) => {
   return (
     <>
       <Route exact path={match.path} component={SelectList} />
-      <Route
-        path={`${match.path}/:id`}
-        component={Translate}
-        // render={(props) => (
-        //   <Translate {...props} fromWhere="newFeedback" studentID="" />
-        // )}
-      />
+      <Route path={`${match.path}/:id`} component={Translate} />
     </>
   );
 };
@@ -70,7 +64,7 @@ const ProfMenu = ({ match }) => {
 export default ProfMenu;
 
 const StyledContainer = styled(Container)`
-  padding: 20px;
+  /* padding: 20px; */
   width: 300px;
   height: 410px;
   flex-direction: row;

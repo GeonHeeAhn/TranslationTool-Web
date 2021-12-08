@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { dbService, authService } from '../fbase';
 import Modal from './userInfoModal';
-import OutsideAlerter from './outsideAlerter';
 
 const Menu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -15,15 +14,14 @@ const Menu = () => {
   };
 
   const getUserInitialInfo = async () => {
-    const dbScript = await dbService.collection('userInfo').get();
+    const dbScript = await dbService.collection('userInformation').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push({
         ...document.data(),
       });
     }
-    if (!arr.find((userid) => userid === authService.uid)) {
-      console.log('업슴');
+    if (!arr.find((el) => el.userID === authService.currentUser.uid)) {
       setIsModalVisible(true);
     }
   };

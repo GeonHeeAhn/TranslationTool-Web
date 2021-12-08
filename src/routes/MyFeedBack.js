@@ -110,13 +110,10 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const sortingFunction = () => {
     if (scriptList === undefined) {
       setWhichCase(2);
-      // window.alert('해당 과제를 제출하지 않았습니다. ');
-      // history.goBack();
     } else {
       setWhichCase(1);
       const dummy = [{ feedBack: [], general_critique: '' }];
       setTranslatedTask(dummy);
-      // window.alert('과제에 대한 피드백이 존재하지 않습니다. ');
     }
   };
 

@@ -177,7 +177,7 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledContainer = styled(Container)`
-  padding: 20px;
+  /* padding: 20px; */
   width: 300px;
   height: 410px;
   flex-direction: row;
