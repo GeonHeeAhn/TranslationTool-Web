@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import OutsideAlerter from './outsideAlerter';
-import { Switch } from '@nextui-org/react';
-import { Input } from '@nextui-org/react';
-import { Button } from '@nextui-org/react';
+import { Switch, Input, Button } from '@nextui-org/react';
 import { dbService, authService } from 'fbase';
 
 const ModalContent = ({ setIsSelected, setIsModalVisible }) => {
@@ -94,6 +92,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 16px;
   }
 `;
+
 const Modal = styled.div`
   position: absolute;
   top: 50%;

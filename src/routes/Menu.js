@@ -7,6 +7,7 @@ import Modal from './userInfoModal';
 
 const Menu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isStudent, setIsStudent] = useState('');
   let history = useHistory();
   const onLogOutClick = () => {
     authService.signOut();
@@ -23,6 +24,13 @@ const Menu = () => {
     }
     if (!arr.find((el) => el.userID === authService.currentUser.uid)) {
       setIsModalVisible(true);
+    } else {
+      const myInfo = arr.filter(
+        (el) => el.userID === authService.currentUser.uid
+      );
+      myInfo[0].isStudent === 'professor'
+        ? setIsStudent('professor')
+        : setIsStudent('student');
     }
   };
 
@@ -37,12 +45,23 @@ const Menu = () => {
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
       />
-      <Link to="/myPage">
-        <Button>학생용</Button>
-      </Link>
-      <Link to="/forprofessor">
-        <Button>교수용</Button>
-      </Link>
+      {isStudent === 'student' ? (
+        <>
+          <Link to="/myPage">
+            <Button>학생용</Button>
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link to="/forprofessor">
+            <Button>교수용</Button>
+          </Link>
+          <Link to="/createtask">
+            <Button>과제생성</Button>
+          </Link>
+        </>
+      )}
+
       <Button
         onClick={onLogOutClick}
         style={{ position: 'absolute', bottom: '20px' }}

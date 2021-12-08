@@ -6,7 +6,7 @@ import Modal from './userInfoModal';
 const Header = () => {
   return (
     <Container>
-      <Link to="/createtask">
+      {/* <Link to="/createtask">
         <ProfileIcon>
           <img
             src={process.env.PUBLIC_URL + '/design/person_icon.png'}
@@ -14,7 +14,7 @@ const Header = () => {
             style={{ height: '30px', width: '30px' }}
           />
         </ProfileIcon>
-      </Link>
+      </Link> */}
       <Link to="/">
         <ProfileIcon>
           <img
