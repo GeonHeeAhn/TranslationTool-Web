@@ -3,42 +3,41 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { Container } from 'routes/Menu.js';
 import { dbService, authService } from 'fbase';
 import { Input, Switch, Textarea, Button } from '@nextui-org/react';
+import useInputs from '../hooks/useInputs';
 
 const CreateTask = () => {
   const [newTask, setNewTask] = useState();
-  const [taskTitle, setTaskTitle] = useState();
-  const [scriptId, setScriptId] = useState();
-  const [startDate, setStartDate] = useState(new Date());
+  const [isPublic, setIsPublic] = useState(true);
+  const taskTitle = useInputs('');
+  const scriptId = useInputs('');
+  const description = useInputs('');
+  const dueDate = useInputs();
 
   const handleChangeFile = (e) => {
     let file = e.target.files[0];
     let reader = new FileReader();
     reader.onload = function (event) {
-      // The file's text will be printed here
       console.log(event.target.result);
       setNewTask(event.target.result);
     };
     reader.readAsText(file);
   };
 
-  const titleOnChange = (e) => {
-    e.preventDefault();
-    setTaskTitle(e.target.value);
-  };
-
-  const idOnChange = (e) => {
-    e.preventDefault();
-    setScriptId(e.target.value);
+  const switchOnChange = (checked) => {
+    checked.target.checked ? setIsPublic('public') : setIsPublic('private');
   };
 
   const uploadOnClick = async () => {
     await dbService.collection('tasks').add({
       professor_ID: authService.currentUser.uid,
       task: newTask,
-      script_ID: scriptId,
-      taskTitle: taskTitle,
-      data: startDate,
+      taskTitle: taskTitle.value,
+      script_ID: scriptId.value,
+      dueDate: dueDate.value,
+      description: description.value,
+      isPublic: isPublic,
     });
+    window.alert('과제가 성공적으로 등록되었습니다. ');
   };
   return (
     <>
@@ -50,9 +49,8 @@ const CreateTask = () => {
           <Input
             placeholder="Add text"
             size="large"
-            value={taskTitle}
-            onChange={(e) => titleOnChange(e)}
             width="250px"
+            {...taskTitle}
           />
         </RowCompo>
         <RowCompo>
@@ -61,22 +59,26 @@ const CreateTask = () => {
             size="large"
             placeholder="task id here"
             color="default"
-            value={scriptId}
-            onChange={(e) => idOnChange(e)}
             width="250px"
+            {...scriptId}
           />
         </RowCompo>
         <RowCompo>
           <div>과제 설명</div>
-          <Textarea placeholder="Add text" minRows={5} width="250px" />
+          <Textarea
+            placeholder="Add text"
+            minRows={5}
+            width="250px"
+            {...description}
+          />
         </RowCompo>
         <RowCompo>
-          <div>과제 제출물 공개 여부</div>{' '}
-          <Switch initialChecked size="large" />
+          <div>과제 제출물 공개 여부</div>
+          <Switch initialChecked size="large" onChange={switchOnChange} />
         </RowCompo>
         <RowCompo>
           <div>기한</div>
-          <Input width="250px" type="date" size="large" />
+          <Input width="250px" type="date" size="large" {...dueDate} />
         </RowCompo>
         <RowCompo>
           <div style={{ width: '100px' }}>
@@ -117,7 +119,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const FileInput = styled.input`
-  /* border-radius: 15px; */
   margin: 5px;
   margin-left: 20px;
 `;
