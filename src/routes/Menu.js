@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { dbService, authService } from '../fbase';
-import Modal from './userInfoModal';
+import { ModalWindow } from './userInfoModal';
 
 const Menu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -40,7 +40,7 @@ const Menu = () => {
 
   return (
     <Container>
-      <Modal
+      <ModalWindow
         style={{ zIndex: '999' }}
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
@@ -58,6 +58,9 @@ const Menu = () => {
           </Link>
           <Link to="/createtask">
             <Button>과제생성</Button>
+          </Link>
+          <Link to="/createSubject">
+            <Button>과목생성</Button>
           </Link>
         </>
       )}

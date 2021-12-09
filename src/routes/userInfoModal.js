@@ -71,7 +71,10 @@ const ModalWindow = ({ isModalVisible, setIsModalVisible }) => {
   return (
     <>
       <GlobalStyle />
-      <ModalBackground isModalVisible={isModalVisible}>
+      <ModalBackground
+        isModalVisible={isModalVisible}
+        style={{ zIndex: '999', positon: 'fixed' }}
+      >
         <OutsideAlerter setIsModalVisible={setIsModalVisible}>
           <Modal isModalVisible={isModalVisible}>
             <ModalContent setIsModalVisible={setIsModalVisible} />
@@ -81,8 +84,6 @@ const ModalWindow = ({ isModalVisible, setIsModalVisible }) => {
     </>
   );
 };
-
-export default ModalWindow;
 
 const GlobalStyle = createGlobalStyle`
   .button.jsx-129748894 {
@@ -164,3 +165,5 @@ const BodyContainer = styled.div`
     display: none;
   }
 `;
+
+export { ModalWindow, Modal, ModalBackground, BodyContainer };

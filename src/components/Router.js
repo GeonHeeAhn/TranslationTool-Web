@@ -8,8 +8,8 @@ import { useState } from 'react';
 import profMenu from '../routes/ProfMenu';
 import MyPage from '../routes/MyPage';
 import Header from '../routes/Header';
-import CreateTask from '../routes/CreateTask';
-import Modal from '../routes/userInfoModal';
+import { CreateTask } from '../routes/CreateTask';
+import CreateSubject from 'routes/CreateSubject';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
@@ -19,7 +19,7 @@ const AppRouter = ({ isLoggedIn }) => {
       <Link to="/student" />
       <Link to="/mypage" />
       <Link to="/createtask" />
-      <Link to="/modal" />
+      <Link to="/createSubject" />
       {isLoggedIn ? (
         <>
           <Route path="/" component={Header} />
@@ -30,7 +30,7 @@ const AppRouter = ({ isLoggedIn }) => {
             <Route path="/forstudent" component={TaskSelect} />
             <Route path="/forprofessor" component={profMenu} />
             <Route path="/myPage" component={MyPage} />
-            <Route path="/modal" component={Modal} />
+            <Route path="/createsubject" component={CreateSubject} />
           </Switch>
         </>
       ) : (
