@@ -4,7 +4,6 @@ import Auth from '../routes/Auth';
 import { Translate } from '../routes/Translate';
 import TaskSelect from '../routes/TaskSelect';
 import { Menu } from '../routes/Menu';
-import { useState } from 'react';
 import profMenu from '../routes/ProfMenu';
 import MyPage from '../routes/MyPage';
 import Header from '../routes/Header';
@@ -20,7 +19,6 @@ const AppRouter = ({ isLoggedIn }) => {
       <Link to="/mypage" />
       <Link to="/createtask" />
       <Link to="/createSubject" />
-      <Link to="/subjectlist" />
       {isLoggedIn ? (
         <>
           <Route path="/" component={Header} />

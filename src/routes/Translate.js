@@ -100,7 +100,7 @@ const BottomContainer = ({
     if (!isSaved) {
       window.alert('저장을 먼저 해주세요');
     } else {
-      await dbService.collection('professorTest').add({
+      await dbService.collection('professor').add({
         student_name: studentScript[0].studentID,
         student_ID: studentScript[0].userID,
         script_ID: studentScript[0].scriptID,
@@ -224,16 +224,6 @@ const TextBox = ({
     console.log(selectedText);
   };
 
-  const WrappedBefore = wrapper(isOriginalScriptEmpty(), {
-    wrapOn: 38,
-    continuationIndent: '\n',
-  });
-
-  const WrappedAfter = wrapper(IsStudentScriptEmpty(), {
-    wrapOn: 38,
-    continuationIndent: '\n',
-  });
-
   const plusId = () => {
     if (num === studentScript.length - 1) {
       alert('더 이상 뒤로 갈 수 없습니다.');
@@ -273,7 +263,6 @@ const TextBox = ({
 };
 
 const Highlighter = ({ text, hoverComment }) => {
-  const newComment = `${(<mark>{hoverComment}</mark>)}`;
   const html = '<mark>{hoverComment}</mark>';
   const newtxt = text?.replace(hoverComment, html);
   const a = newtxt?.replace('{hoverComment}', hoverComment);
@@ -381,12 +370,10 @@ const StudentInfoBox = ({ IsStudentNameEmpty }) => {
 
 const deleteChart = (feedBack, chartValue, options, setChartValue) => {
   let arr = chartValue;
-  console.log(arr);
   const targetIdx = options.findIndex((item) => {
     return item.label === feedBack;
   });
   arr[targetIdx] -= 1;
-  console.log(arr);
   setChartValue(arr);
 };
 
@@ -419,7 +406,7 @@ function Translate({ match, history, location }) {
   const fromWhere = location.state.fromWhere;
   const studentID = location.state.studentID;
   const getScripts = async () => {
-    const dbScript = await dbService.collection('studentTest').get();
+    const dbScript = await dbService.collection('student').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push({ ...document.data(), id: document.id });
@@ -485,7 +472,7 @@ function Translate({ match, history, location }) {
       (el) => el.professor_ID === authService.currentUser.uid
     );
     if (fromWhere === 'newFeedback') {
-      setMySavings(filterByUID); //배열 length >= 1
+      setMySavings(filterByUID);
       setFinalComment(filterByUID.map((a) => a.general_critique));
       Arr = filterByUID.map((a) => a.feedBack);
       setLoadedFeedback(Arr);
@@ -494,11 +481,11 @@ function Translate({ match, history, location }) {
       const filterByStudentID = filterByUID.filter(
         (el) => el.student_ID === studentID
       );
-      setMySavings(filterByStudentID); //배열 length 0 or 1
+      setMySavings(filterByStudentID);
       setFinalComment(filterByStudentID.map((a) => a.general_critique));
       Arr = filterByStudentID.map((a) => a.feedBack);
       setLoadedFeedback(Arr);
-      console.log('filterbystudentID 이쓸 때', filterByStudentID);
+      console.log('filterbystudentID 있을 때', filterByStudentID);
     }
     setStudNum(Arr.length);
     // setFinalComment(mySavings.map((a) => a.general_critique));
@@ -536,7 +523,6 @@ function Translate({ match, history, location }) {
         selectedText: selectedText[nextId.current],
       };
       setLoadedFeedback([...loadedFeedback, FB]);
-      console.log(loadedFeedback);
       updateChart(value.value);
       setInputText('');
     }
@@ -596,7 +582,6 @@ function Translate({ match, history, location }) {
       <GlobalStyle />
       <StyledContainer>
         <Box>
-          {console.log('hoverComment', hoverComment)}
           <StudentInfoBox IsStudentNameEmpty={IsStudentNameEmpty} />
           <TextBox
             studentScript={studentScript}

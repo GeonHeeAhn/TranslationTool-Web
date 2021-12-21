@@ -77,6 +77,14 @@ const Chart = ({ options, chartValue }) => {
   );
 };
 
+const Highlighter = ({ text, hoverComment }) => {
+  const html = '<mark>{hoverComment}</mark>';
+  const newtxt = text?.replace(hoverComment, html);
+  const a = newtxt?.replace('{hoverComment}', hoverComment);
+
+  return <div dangerouslySetInnerHTML={{ __html: a }} />;
+};
+
 const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [myScript, setMyScript] = useState('loading');
   const [originalScript, setOriginalScript] = useState();
@@ -88,6 +96,8 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
   const [options, setOptions] = useState([]);
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
+  const [hoverComment, setHoverComment] = useState([]);
+  const [isHover, setIsHover] = useState(false);
   const [translatedTask, setTranslatedTask] = useState([]);
   const [whichCase, setWhichCase] = useState(0);
   const [changedTask, setChangedTask] = useState(wrappedTranslatedScript);
@@ -250,40 +260,24 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
           <TextContainer>
             <ChangeButton onClick={minusId}>-</ChangeButton>
             <TextField>
-              {wrappedOriginalScript.split('\n').map((line) => {
-                return (
-                  <>
-                    {line !== '' ? (
-                      <span>
-                        {i++} : {line}
-                        <br />
-                      </span>
-                    ) : (
-                      <span>
-                        {line} <br />
-                      </span>
-                    )}
-                  </>
-                );
-              })}
+              {isHover ? (
+                <Highlighter
+                  text={wrappedOriginalScript}
+                  hoverComment={hoverComment}
+                />
+              ) : (
+                <>{wrappedOriginalScript}</>
+              )}
             </TextField>
             <TextField>
-              {wrappedTranslatedScript.split('\n').map((line) => {
-                return (
-                  <>
-                    {line !== '' ? (
-                      <span>
-                        {j++} : {line}
-                        <br />
-                      </span>
-                    ) : (
-                      <span>
-                        {line} <br />
-                      </span>
-                    )}
-                  </>
-                );
-              })}
+              {isHover ? (
+                <Highlighter
+                  text={wrappedTranslatedScript}
+                  hoverComment={hoverComment}
+                />
+              ) : (
+                <>{wrappedTranslatedScript}</>
+              )}
             </TextField>
             <ChangeButton onClick={plusId}>+</ChangeButton>
           </TextContainer>
@@ -291,13 +285,21 @@ const StudentVersion = ({ match, myName, history, myTask, myScriptList }) => {
             <FeedBackList>
               {feedBackList &&
                 feedBackList.map((el) => (
-                  <FeedBackBox key={el.id}>
+                  <FeedBackBox
+                    key={el.id}
+                    onMouseOver={() => {
+                      const arr = [el.selectedText.text];
+                      setHoverComment(arr);
+                      setIsHover(true);
+                    }}
+                    onMouseOut={() => {
+                      setIsHover(false);
+                    }}
+                  >
                     <div>
                       {el.id} . {el.feedBack} : {el.comment}
                     </div>
-                    <div>
-                      {el.selectedText.indexNum}번째 줄 : {el.selectedText.text}
-                    </div>
+                    <div>: {el.selectedText.text}</div>
                   </FeedBackBox>
                 ))}
             </FeedBackList>
@@ -342,6 +344,8 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
   const [critique, setCritique] = useState('loading');
   const [indexNum, setIndexNum] = useState(0);
   const [isMyUID, setIsMyUID] = useState();
+  const [isHover, setIsHover] = useState(false);
+  const [hoverComment, setHoverComment] = useState([]);
   const [professorFeedBack, setProfessorFeedBack] = useState([]);
   const [isModifying, setIsModifying] = useState(false);
   let i = 1;
@@ -395,13 +399,14 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
 
   const getMyFeedBack = async () => {
     const arr = [];
-    const dbScript = await dbService.collection('professorTest').get();
+    const dbScript = await dbService.collection('professor').get();
     for (const document of dbScript.docs) {
       arr.push(document.data());
     }
     const Arr = arr.filter((el) => el.script_ID === match.params.id);
     const fb = Arr.filter((el) => el.student_name === myName);
     setProfessorFeedBack(fb);
+    console.log('feedback', fb);
     const professorID = fb.map((a) => a.professor_ID);
     setIsMyUID(professorID);
     const TotalCritique = fb.map((a) => a.general_critique);
@@ -509,40 +514,25 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
         <TextContainer>
           <ChangeButton onClick={minusId}>-</ChangeButton>
           <TextField>
-            {wrappedOriginalScript.split('\n').map((line) => {
-              return (
-                <>
-                  {line !== '' ? (
-                    <span>
-                      {i++} : {line}
-                      <br />
-                    </span>
-                  ) : (
-                    <span>
-                      {line} <br />
-                    </span>
-                  )}
-                </>
-              );
-            })}
+            {/* {wrappedOriginalScript} */}
+            {isHover ? (
+              <Highlighter
+                text={wrappedOriginalScript}
+                hoverComment={hoverComment}
+              />
+            ) : (
+              <>{wrappedOriginalScript}</>
+            )}
           </TextField>
           <TextField>
-            {wrappedTranslatedScript.split('\n').map((line) => {
-              return (
-                <>
-                  {line !== '' ? (
-                    <span>
-                      {j++} : {line}
-                      <br />
-                    </span>
-                  ) : (
-                    <span>
-                      {line} <br />
-                    </span>
-                  )}
-                </>
-              );
-            })}
+            {isHover ? (
+              <Highlighter
+                text={wrappedTranslatedScript}
+                hoverComment={hoverComment}
+              />
+            ) : (
+              <> {wrappedTranslatedScript}</>
+            )}
           </TextField>
           <ChangeButton onClick={plusId}>+</ChangeButton>
         </TextContainer>
@@ -550,7 +540,17 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
           <FeedBackList>
             {feedBackList &&
               feedBackList.map((el) => (
-                <FeedBackBox key={el.id}>
+                <FeedBackBox
+                  key={el.id}
+                  onMouseOver={() => {
+                    const arr = [el.selectedText.text];
+                    setHoverComment(arr);
+                    setIsHover(true);
+                  }}
+                  onMouseOut={() => {
+                    setIsHover(false);
+                  }}
+                >
                   <div>
                     {el.id} . {el.feedBack} : {el.comment}
                   </div>
@@ -564,6 +564,8 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
         <CritiqueContainer>{critique[indexNum]}</CritiqueContainer>
         {isMyFeedBack()}
         <SpaceContainer />
+        <Spacer />
+        <Spacer />
       </Box>
     </StyledContainer>
   );
@@ -677,4 +679,7 @@ const UpdateButton = styled.button`
   a:active {
     border: none;
   }
+`;
+const Spacer = styled.div`
+  height: 30px;
 `;

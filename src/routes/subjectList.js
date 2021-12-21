@@ -4,6 +4,7 @@ import { Route, Link } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import 'boxicons';
 import Select from 'react-select';
+import TaskList from './TaskList';
 // import { doc, deleteDoc } from 'firebase/firestore';
 
 const classOptions = [
@@ -108,6 +109,11 @@ const SubjectList = () => {
         <Spacer />
         <SubjListContainer>
           {subjectList.map((item) => (
+            // <Link
+            //   to={{
+            //     pathname: `${match.url}/${item.classNum}`,
+            //   }}
+            // >
             <StyledButton>
               <InnerBtnContainer>
                 <div style={{ width: 200, textAlign: 'left' }}>
@@ -122,6 +128,7 @@ const SubjectList = () => {
                 />
               </InnerBtnContainer>
             </StyledButton>
+            // </Link>
           ))}
         </SubjListContainer>
         <Link to="/createsubject">
@@ -138,6 +145,15 @@ const SubjectList = () => {
     </>
   );
 };
+
+// const SubjList = ({ match }) => {
+//   return (
+//     <>
+//       <Route exact path={match.path} component={SubjectList} />
+//       <Route path={`${match.path}/:id`} component={TaskList} />
+//     </>
+//   );
+// };
 
 export default SubjectList;
 

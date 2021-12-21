@@ -54,16 +54,18 @@ const Menu = () => {
         </Container>
       ) : (
         <>
-          {/* <Link to="/forprofessor">
-            <Button>교수용</Button>
-          </Link>
-          <Link to="/createtask">
-            <Button>과제생성</Button>
-          </Link>
-          <Link to="/createSubject">
-            <Button>과목생성</Button>
-          </Link> */}
-          <SubjectList />
+          <Container>
+            <Link to="/forprofessor">
+              <Button>교수용</Button>
+            </Link>
+            <Link to="/createtask">
+              <Button>과제생성</Button>
+            </Link>
+            <Link to="/myPage">
+              <Button>학생용</Button>
+            </Link>
+          </Container>
+          {/* <SubjectList /> */}
         </>
       )}
 
