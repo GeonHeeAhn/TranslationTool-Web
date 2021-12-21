@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { dbService, authService } from '../fbase';
 import { ModalWindow } from './userInfoModal';
+import SubjectList from './subjectList';
 
 const Menu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -39,21 +40,21 @@ const Menu = () => {
   }, []);
 
   return (
-    <Container>
+    <>
       <ModalWindow
         style={{ zIndex: '999' }}
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
       />
       {isStudent === 'student' ? (
-        <>
+        <Container>
           <Link to="/myPage">
             <Button>학생용</Button>
           </Link>
-        </>
+        </Container>
       ) : (
         <>
-          <Link to="/forprofessor">
+          {/* <Link to="/forprofessor">
             <Button>교수용</Button>
           </Link>
           <Link to="/createtask">
@@ -61,7 +62,8 @@ const Menu = () => {
           </Link>
           <Link to="/createSubject">
             <Button>과목생성</Button>
-          </Link>
+          </Link> */}
+          <SubjectList />
         </>
       )}
 
@@ -71,7 +73,7 @@ const Menu = () => {
       >
         press here to logout{' '}
       </Button>
-    </Container>
+    </>
   );
 };
 
