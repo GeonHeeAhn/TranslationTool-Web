@@ -22,7 +22,6 @@ const CreateTask = () => {
     let file = e.target.files[0];
     let reader = new FileReader();
     reader.onload = function (event) {
-      console.log(event.target.result);
       setNewTask(event.target.result);
     };
     reader.readAsText(file);

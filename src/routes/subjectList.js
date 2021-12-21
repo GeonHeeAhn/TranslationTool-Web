@@ -106,20 +106,24 @@ const SubjectList = () => {
           placeholder="연도/학기 "
         />
         <Spacer />
-        {subjectList.map((item) => (
-          <StyledButton>
-            <InnerBtnContainer>
-              {item.subjectName}
-              <ButtonGroup
-                originalList={originalList}
-                subject={item.subjectName}
-                classNum={item.classNum}
-                isDelete={isDelete}
-                setIsDelete={setIsDelete}
-              />
-            </InnerBtnContainer>
-          </StyledButton>
-        ))}
+        <SubjListContainer>
+          {subjectList.map((item) => (
+            <StyledButton>
+              <InnerBtnContainer>
+                <div style={{ width: 200, textAlign: 'left' }}>
+                  {item.subjectName}
+                </div>
+                <ButtonGroup
+                  originalList={originalList}
+                  subject={item.subjectName}
+                  classNum={item.classNum}
+                  isDelete={isDelete}
+                  setIsDelete={setIsDelete}
+                />
+              </InnerBtnContainer>
+            </StyledButton>
+          ))}
+        </SubjListContainer>
         <Link to="/createsubject">
           <AddSubjContainer>
             <IconBtn>
@@ -226,4 +230,15 @@ const AddSubjContainer = styled.button`
   font-weight: 600;
   font-size: 18px;
   color: black;
+`;
+
+const SubjListContainer = styled.div`
+  width: 100%;
+  overflow-y: auto;
+  padding-left: 50px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
