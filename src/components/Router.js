@@ -10,6 +10,7 @@ import MyPage from '../routes/MyPage';
 import Header from '../routes/Header';
 import { CreateTask } from '../routes/CreateTask';
 import CreateSubject from 'routes/CreateSubject';
+import SubjectList from '../routes/subjectList';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
@@ -20,6 +21,7 @@ const AppRouter = ({ isLoggedIn }) => {
       <Link to="/mypage" />
       <Link to="/createtask" />
       <Link to="/createSubject" />
+      <Link to="/subjectlist" />
       {isLoggedIn ? (
         <>
           <Route path="/" component={Header} />
@@ -31,6 +33,7 @@ const AppRouter = ({ isLoggedIn }) => {
             <Route path="/forprofessor" component={profMenu} />
             <Route path="/myPage" component={MyPage} />
             <Route path="/createsubject" component={CreateSubject} />
+            <Route path="/subjectlist" component={SubjectList} />
           </Switch>
         </>
       ) : (

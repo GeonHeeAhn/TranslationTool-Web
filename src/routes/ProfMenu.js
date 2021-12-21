@@ -35,19 +35,21 @@ const SelectList = ({ match }) => {
 
   return (
     <StyledContainer>
-      {dummyData.student_data.map((item) => (
-        <Link
-          to={{
-            pathname: `${match.url}/${item.id}`,
-            state: {
-              fromWhere: 'newFeedback',
-              studentID: '',
-            },
-          }}
-        >
-          <StyledButton>{item.label}</StyledButton>
-        </Link>
-      ))}
+      <>
+        {dummyData.student_data.map((item) => (
+          <Link
+            to={{
+              pathname: `${match.url}/${item.id}`,
+              state: {
+                fromWhere: 'newFeedback',
+                studentID: '',
+              },
+            }}
+          >
+            <StyledButton>{item.label}</StyledButton>
+          </Link>
+        ))}
+      </>
     </StyledContainer>
   );
 };
@@ -64,9 +66,6 @@ const ProfMenu = ({ match }) => {
 export default ProfMenu;
 
 const StyledContainer = styled(Container)`
-  /* padding: 20px; */
-  width: 300px;
-  height: 410px;
   flex-direction: row;
   flex-wrap: wrap;
   align-content: space-around;

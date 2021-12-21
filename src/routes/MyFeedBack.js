@@ -347,7 +347,7 @@ const ProfVersion = ({ myName, match, history, setStudentID, studentID }) => {
   let i = 1;
   let j = 1;
   const getMyScript = async () => {
-    const dbScript = await dbService.collection('studentTest').get();
+    const dbScript = await dbService.collection('student').get();
     const arr = [];
     for (const document of dbScript.docs) {
       arr.push(document.data());
