@@ -67,6 +67,7 @@ const CreateSubject = () => {
       window.alert('주어진 정보를 모두 입력해주세요. ');
     } else {
       await dbService.collection('subject').add({
+        professorID: authService.currentUser.uid,
         subjectName: subjName.value,
         semester: semesterValue.value,
         classNum: classNum.value + '-' + classValue.value,

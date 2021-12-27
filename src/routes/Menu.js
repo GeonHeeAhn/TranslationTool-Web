@@ -56,13 +56,16 @@ const Menu = () => {
         <>
           <Container>
             <Link to="/forprofessor">
-              <Button>교수용</Button>
+              <Button>피드백 작성</Button>
+            </Link>
+            <Link to="/myPage">
+              <Button>피드백 열람</Button>
             </Link>
             <Link to="/createtask">
               <Button>과제생성</Button>
             </Link>
-            <Link to="/myPage">
-              <Button>학생용</Button>
+            <Link to="/subjectList">
+              <Button>과목 열람</Button>
             </Link>
           </Container>
           {/* <SubjectList /> */}

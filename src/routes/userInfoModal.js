@@ -155,7 +155,6 @@ const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* align-items: center; */
   padding: 30px 50px 30px 50px;
   width: 100%;
   height: 100%;
@@ -166,4 +165,4 @@ const BodyContainer = styled.div`
   }
 `;
 
-export { ModalWindow, Modal, ModalBackground, BodyContainer };
+export { ModalWindow, Modal, TextLabel, ModalBackground, BodyContainer, Title };
