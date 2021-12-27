@@ -1,10 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Button, Container } from 'routes/Menu';
 import { Translate } from 'routes/Translate';
 import { Route, Link } from 'react-router-dom';
 import { dbService } from 'fbase.js';
 import dummyData from '../dummyData.js';
+import {
+  StyledContainer,
+  StyledButton,
+  InnerBtnContainer,
+  BtnGroup,
+  IconBtn,
+  AddSubjContainer,
+  SubjListContainer,
+} from './subjectList';
+import 'boxicons';
+
+const ButtonGroup = () => {
+  return (
+    <BtnGroup>
+      <IconBtn style={{ marginLeft: 10 }}>
+        <box-icon type="solid" name="pencil" size="sm" animation="tada-hover" />
+      </IconBtn>
+      <IconBtn>
+        <box-icon type="solid" name="trash" size="sm" animation="tada-hover" />
+      </IconBtn>
+    </BtnGroup>
+  );
+};
 
 const SelectList = ({ match }) => {
   const [subjectId, setSubjectId] = useState([]);
@@ -35,7 +57,9 @@ const SelectList = ({ match }) => {
 
   return (
     <StyledContainer>
-      <>
+      <Spacer />
+      <Title>과제 목록</Title>
+      <SubjListContainer>
         {dummyData.student_data.map((item) => (
           <Link
             to={{
@@ -46,10 +70,28 @@ const SelectList = ({ match }) => {
               },
             }}
           >
-            <StyledButton>{item.label}</StyledButton>
+            <StyledButton>
+              <InnerBtnContainer>
+                <div style={{ width: 200, textAlign: 'left' }}>
+                  {item.label}
+                </div>
+                <ButtonGroup />
+              </InnerBtnContainer>
+            </StyledButton>
           </Link>
         ))}
-      </>
+      </SubjListContainer>
+      <Link to="/createtask">
+        <AddSubjContainer>
+          <IconBtn>
+            <box-icon name="plus-circle" type="solid" size="sm"></box-icon>
+          </IconBtn>
+          <Spacer />
+          과목 추가
+        </AddSubjContainer>
+      </Link>
+      <Spacer />
+      <Spacer />
     </StyledContainer>
   );
 };
@@ -65,16 +107,13 @@ const ProfMenu = ({ match }) => {
 
 export default ProfMenu;
 
-const StyledContainer = styled(Container)`
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: space-around;
+const Spacer = styled.div`
+  height: 30px;
+  width: 16px;
 `;
 
-const StyledButton = styled(Button)`
-  width: 130px;
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 0px;
-  font-size: 0.9rem;
+const Title = styled.h3`
+  width: 500px;
+  text-align: left;
+  margin: 30px;
 `;

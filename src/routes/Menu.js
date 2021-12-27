@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { dbService, authService } from '../fbase';
 import { ModalWindow } from './userInfoModal';
-import SubjectList from './subjectList';
+import { SubjectList } from './subjectList';
 
 const Menu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);

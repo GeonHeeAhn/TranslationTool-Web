@@ -155,8 +155,6 @@ const SubjectList = () => {
 //   );
 // };
 
-export default SubjectList;
-
 const GlobalStyle = createGlobalStyle`
 .css-g1d714-ValueContainer{
     width: 400px;
@@ -258,3 +256,14 @@ const SubjListContainer = styled.div`
     display: none;
   }
 `;
+
+export {
+  SubjectList,
+  StyledContainer,
+  StyledButton,
+  InnerBtnContainer,
+  BtnGroup,
+  IconBtn,
+  AddSubjContainer,
+  SubjListContainer,
+};

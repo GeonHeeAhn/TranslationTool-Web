@@ -9,7 +9,7 @@ import MyPage from '../routes/MyPage';
 import Header from '../routes/Header';
 import { CreateTask } from '../routes/CreateTask';
 import CreateSubject from 'routes/CreateSubject';
-import SubjectList from '../routes/subjectList';
+import { SubjectList } from '../routes/subjectList';
 
 const AppRouter = ({ isLoggedIn }) => {
   return (
