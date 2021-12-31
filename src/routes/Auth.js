@@ -182,7 +182,7 @@ export default function Auth() {
         </span>
         <Spacer />
 
-        <Button flat color="primary" rounded type="submit" width="250px">
+        <Button flat color="primary" rounded type="submit" width="300px">
           {newAccount ? 'CreateAccount' : 'Login'}
         </Button>
         <div style={{ textAlign: 'center' }}>{error}</div>

@@ -109,26 +109,22 @@ const SubjectList = () => {
         <Spacer />
         <SubjListContainer>
           {subjectList.map((item) => (
-            // <Link
-            //   to={{
-            //     pathname: `${match.url}/${item.classNum}`,
-            //   }}
-            // >
-            <StyledButton>
-              <InnerBtnContainer>
-                <div style={{ width: 200, textAlign: 'left' }}>
-                  {item.subjectName}
-                </div>
-                <ButtonGroup
-                  originalList={originalList}
-                  subject={item.subjectName}
-                  classNum={item.classNum}
-                  isDelete={isDelete}
-                  setIsDelete={setIsDelete}
-                />
-              </InnerBtnContainer>
-            </StyledButton>
-            // </Link>
+            <Link to="/forprofessor">
+              <StyledButton>
+                <InnerBtnContainer>
+                  <div style={{ width: 200, textAlign: 'left' }}>
+                    {item.subjectName}
+                  </div>
+                  <ButtonGroup
+                    originalList={originalList}
+                    subject={item.subjectName}
+                    classNum={item.classNum}
+                    isDelete={isDelete}
+                    setIsDelete={setIsDelete}
+                  />
+                </InnerBtnContainer>
+              </StyledButton>
+            </Link>
           ))}
         </SubjListContainer>
         <Link to="/createsubject">
